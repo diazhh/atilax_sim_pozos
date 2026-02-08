@@ -187,9 +187,11 @@ class WellModel:
         attrs: dict[str, Any] = {
             # Well identity
             "well_name": self.name,
+            "well_code_pdvsa": f"PDVSA-{self.field_name[:3].upper()}-{self.name}",
             "field_name": self.field_name,
             "macolla_name": self.macolla_name,
             "lift_type": self.lift_type.value,
+            "lifting_type": self.lift_type.value,
             "status": self.status.value,
             # Geometry
             "total_depth_md_ft": self.total_depth_md_ft,

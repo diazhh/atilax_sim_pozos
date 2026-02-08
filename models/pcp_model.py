@@ -108,6 +108,10 @@ class PCPModel(WellModel):
         torque_mod = self.anomaly_modifiers.get("torque", 1.0)
         efficiency_mod = self.anomaly_modifiers.get("efficiency", 1.0)
 
+        # Calculate pump efficiency for PCP
+        volumetric_efficiency = min(100, max(40, 95 * efficiency_mod))
+        pump_efficiency_pct = volumetric_efficiency * 0.85
+
         telemetry: dict[str, Any] = {
             "thp_psi": round(thp, 1),
             "chp_psi": round(chp, 1),
@@ -131,7 +135,14 @@ class PCPModel(WellModel):
             "sand_pct": round(
                 self._noise.with_outliers(self.sand_pct, 25.0, min_val=0, max_val=10), 2
             ),
+            "pump_efficiency_pct": round(pump_efficiency_pct, 1),
         }
+
+        # Add aliases for ThingsBoard rule compatibility
+        telemetry["tubing_pressure_psi"] = telemetry["thp_psi"]
+        telemetry["casing_pressure_psi"] = telemetry["chp_psi"]
+        telemetry["speed_rpm"] = telemetry["drive_rpm"]
+        telemetry["motor_torque_ftlb"] = telemetry["drive_torque_ftlb"]
 
         return telemetry
 

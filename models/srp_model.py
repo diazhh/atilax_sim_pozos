@@ -117,6 +117,9 @@ class SRPModel(WellModel):
         fillage_mod = self.anomaly_modifiers.get("fillage", 1.0)
         load_mod = self.anomaly_modifiers.get("load", 1.0)
 
+        # Calculate pump efficiency for SRP
+        pump_efficiency_pct = min(100, max(30, self.pump_fillage_pct * fillage_mod * 0.9))
+
         telemetry: dict[str, Any] = {
             "thp_psi": round(thp, 1),
             "chp_psi": round(chp, 1),
@@ -137,10 +140,16 @@ class SRPModel(WellModel):
                     self.pump_fillage_pct * fillage_mod, 3.0, min_val=20, max_val=100
                 ), 1
             ),
+            "pump_efficiency_pct": round(pump_efficiency_pct, 1),
             "stroke_counter": self.stroke_counter,
             "flow_rate_bpd": round(base["flow_rate_bpd"], 1),
             "water_cut_pct": round(base["water_cut_pct"], 2),
         }
+
+        # Add aliases for ThingsBoard rule compatibility
+        telemetry["tubing_pressure_psi"] = telemetry["thp_psi"]
+        telemetry["casing_pressure_psi"] = telemetry["chp_psi"]
+        telemetry["load_lb"] = telemetry["polished_rod_load_max_lb"]
 
         # Generate dynamo card periodically (~every 30 min sim time)
         minutes_in_step = dt_days * 1440

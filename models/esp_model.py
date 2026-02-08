@@ -124,6 +124,10 @@ class ESPModel(WellModel):
         vibration_mod = self.anomaly_modifiers.get("vibration", 1.0)
         temp_mod = self.anomaly_modifiers.get("temperature", 1.0)
 
+        # Calculate pump efficiency
+        hydraulic_power = (discharge_p - intake_p) * flow_rate / 1714  # HP
+        pump_efficiency_pct = min(100, max(0, (hydraulic_power / max(power_kw * 1.341, 0.1)) * 100))
+
         telemetry: dict[str, Any] = {
             "thp_psi": round(self._noise.gaussian(thp, 2.0, min_val=10), 1),
             "chp_psi": round(self._noise.gaussian(chp, 2.0, min_val=10), 1),
@@ -150,7 +154,16 @@ class ESPModel(WellModel):
             "flow_rate_bpd": round(base["flow_rate_bpd"] * efficiency_mod, 1),
             "water_cut_pct": round(base["water_cut_pct"], 2),
             "gor_scf_stb": round(base["gor_scf_stb"], 1),
+            "pump_efficiency_pct": round(pump_efficiency_pct, 1),
         }
+
+        # Add aliases for ThingsBoard rule compatibility
+        telemetry["frequency_hz"] = telemetry["vsd_frequency_hz"]
+        telemetry["motor_temperature_f"] = telemetry["motor_temp_f"]
+        telemetry["vibration_ips"] = round(max(vibration_x, vibration_y) * vibration_mod, 4)
+        telemetry["tubing_pressure_psi"] = telemetry["thp_psi"]
+        telemetry["casing_pressure_psi"] = telemetry["chp_psi"]
+        telemetry["wellhead_temperature_f"] = telemetry["tht_f"]
 
         return telemetry
 
