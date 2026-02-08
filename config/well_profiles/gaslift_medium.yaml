@@ -1,0 +1,69 @@
+# Perfil de pozo Gas Lift en crudo liviano-medio
+lift_type: "gas_lift"
+profile_name: "gaslift_medium"
+description: "Gas Lift continuo en crudo liviano-medio, Oriente/Lago"
+
+equipment:
+  mandrels:
+    count: [4, 7]
+    operating_valve_depth_ft: [4000, 10000]
+    valve_type: "injection_pressure_operated"
+    port_size_64ths: [12, 24]
+  compressor_allocation:
+    max_injection_mscfd: [300, 1500]
+    injection_pressure_psi: [800, 1800]
+  choke:
+    type: "adjustable"
+    size_range_64ths: [12, 48]
+
+installation:
+  deepest_valve_ft: [5000, 10000]
+  injection_point_ft: [4000, 9000]
+  perforations_top_ft: [5500, 11000]
+  perforations_bottom_ft: [6000, 12000]
+
+operating_envelope:
+  max_injection_rate_mscfd: 1500
+  min_injection_rate_mscfd: 100
+  max_injection_pressure_psi: 2000
+  optimal_glr_scf_stb: [400, 1200]
+  choke_range_64ths: [12, 48]
+
+telemetry_ranges:
+  thp_psi: [80, 400]
+  chp_psi: [400, 1200]
+  tht_f: [120, 200]
+  gl_injection_rate_mscfd: [200, 1200]
+  gl_injection_pressure_psi: [600, 1800]
+  choke_size_64ths: [12, 48]
+
+noise_profile:
+  pressure_pct: 3.0
+  temperature_pct: 0.8
+  injection_rate_pct: 5.0
+  flow_rate_pct: 8.0
+
+glpc:
+  points: 15
+  optimal_rate_mscfd: [400, 800]
+  max_production_increase_pct: 30
+
+failure_modes:
+  - name: "casing_heading"
+    mtbf_days: 120
+    duration_hours: [2, 48]
+    signature:
+      pressure_oscillation_period_min: [5, 30]
+      pressure_amplitude_psi: [50, 200]
+      production_variation_pct: 30
+  - name: "valve_malfunction"
+    mtbf_days: 365
+    signature:
+      injection_pressure_change_psi: 100
+      production_drop_pct: 20
+  - name: "compressor_trip"
+    mtbf_days: 90
+    duration_hours: [1, 24]
+    signature:
+      injection_rate_drop_pct: 100
+      production_drop_pct: 70

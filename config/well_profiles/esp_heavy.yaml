@@ -1,0 +1,90 @@
+# Perfil de pozo ESP en crudo pesado (Lago de Maracaibo)
+lift_type: "ESP"
+profile_name: "esp_heavy"
+description: "Bomba electrosumergible en crudo pesado 10-18° API"
+
+equipment:
+  pump:
+    manufacturer: "Baker Hughes"
+    series: "Centrilift P35"
+    stages: [120, 280]
+    design_rate_bpd: [500, 2000]
+    design_head_ft: [3000, 8000]
+    best_efficiency_point_bpd: [800, 1500]
+    efficiency_at_bep: [0.55, 0.65]
+    min_flow_bpd: 200
+  motor:
+    hp: [60, 250]
+    voltage_v: [1000, 3500]
+    amperage_a: [20, 80]
+    poles: 2
+    power_factor: 0.85
+  cable:
+    type: "flat"
+    gauge_awg: 4
+    length_ft: [4000, 10000]
+  vsd:
+    installed: true
+    frequency_range_hz: [35, 65]
+    nominal_frequency_hz: 60
+  intake:
+    type: "standard"
+    gas_separator: true
+  seal:
+    type: "labyrinth"
+
+installation:
+  pump_depth_ft: [4000, 8000]
+  perforations_top_ft: [4500, 9000]
+  perforations_bottom_ft: [5000, 10000]
+
+operating_envelope:
+  motor_temp_max_f: 300
+  vibration_alarm_ips: 0.5
+  vibration_shutdown_ips: 1.0
+  insulation_alarm_mohm: 200
+  insulation_shutdown_mohm: 50
+  current_overload_pct: 110
+  underload_pct: 60
+
+telemetry_ranges:
+  thp_psi: [50, 300]
+  chp_psi: [100, 600]
+  tht_f: [110, 180]
+  intake_pressure_psi: [300, 1500]
+  discharge_pressure_psi: [1500, 4500]
+  motor_temp_f: [180, 280]
+  intake_temp_f: [140, 220]
+  motor_current_a: [20, 80]
+  motor_voltage_v: [1000, 3500]
+  vsd_frequency_hz: [35, 65]
+  vibration_ips: [0.02, 0.3]
+  insulation_mohm: [500, 2000]
+
+noise_profile:
+  pressure_pct: 2.0
+  temperature_pct: 0.5
+  current_pct: 3.0
+  vibration_pct: 15.0
+  flow_rate_pct: 7.0
+
+failure_modes:
+  - name: "pump_degradation"
+    mtbf_days: 730
+    onset_days: [30, 90]
+    signature:
+      efficiency_drop_pct_per_day: 0.15
+      current_rise_pct_per_day: 0.1
+      vibration_rise_pct_per_day: 0.2
+  - name: "motor_overheating"
+    mtbf_days: 1095
+    onset_days: [5, 20]
+    signature:
+      temp_rise_f_per_day: 2.0
+      insulation_drop_mohm_per_day: 10
+  - name: "gas_lock"
+    mtbf_days: 365
+    duration_hours: [0.5, 4]
+    signature:
+      current_drop_pct: 40
+      flow_drop_pct: 80

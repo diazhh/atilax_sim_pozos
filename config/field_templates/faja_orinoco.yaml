@@ -1,0 +1,67 @@
+# Template para campos de la Faja Petrolífera del Orinoco
+# Crudo extrapesado 6-12° API, alta viscosidad, pozos horizontales
+field_type: "faja_orinoco"
+description: "Faja Petrolífera del Orinoco - Crudo Extrapesado"
+
+reservoir_defaults:
+  pressure_psi: [800, 1500]
+  temperature_f: [120, 160]
+  api_gravity: [6, 10]
+  viscosity_cp: [2000, 12000]
+  water_cut_range: [0.10, 0.50]
+  gor_range: [50, 120]
+  bubble_point_psi: [300, 800]
+  bo_factor: [1.02, 1.08]
+  drive_mechanism: "solution_gas"
+  depth_ft: [2000, 4500]
+  permeability_md: [500, 5000]
+  porosity_pct: [25, 35]
+  net_pay_ft: [30, 120]
+
+well_defaults:
+  completion_type: "horizontal"
+  total_depth_md_ft: [3500, 8000]
+  total_depth_tvd_ft: [2000, 4000]
+  casing_od_in: 9.625
+  casing_id_in: 8.681
+  tubing_od_in: 3.5
+  tubing_id_in: 2.992
+  deviation_max_deg: [60, 90]
+
+lift_distribution:
+  PCP: 0.55
+  ESP: 0.35
+  SRP: 0.10
+
+production_defaults:
+  avg_rate_bpd: [300, 2500]
+  decline_rate_annual: [0.03, 0.10]
+  ipr_model: "vogel"
+
+facility_types:
+  - type: "separator"
+    count_per_macolla: 2
+    specs:
+      pressure_psi: 50
+      capacity_bpd: 15000
+  - type: "heater_treater"
+    count_per_macolla: 1
+    specs:
+      temperature_f: 180
+      capacity_bpd: 20000
+  - type: "tank"
+    count_per_macolla: 3
+    specs:
+      capacity_bbl: 10000
+
+naming_convention:
+  field_prefix: "FO"
+  well_prefix: "FO-{macolla}-{seq:03d}H"
+  macolla_prefix: "MAC-{seq:02d}"
+
+challenges:
+  - "high_viscosity"
+  - "sand_production"
+  - "diluent_requirements"
+  - "artificial_lift_limitations"
+  - "high_temperature_limitations"

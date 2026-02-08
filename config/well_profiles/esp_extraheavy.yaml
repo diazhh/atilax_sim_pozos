@@ -1,0 +1,90 @@
+# Perfil de pozo ESP en crudo extrapesado (Faja del Orinoco)
+lift_type: "ESP"
+profile_name: "esp_extraheavy"
+description: "Bomba electrosumergible en crudo extrapesado 6-10° API, pozos horizontales"
+
+equipment:
+  pump:
+    manufacturer: "Schlumberger"
+    series: "REDA HPS"
+    stages: [60, 180]
+    design_rate_bpd: [800, 3000]
+    design_head_ft: [2000, 5000]
+    best_efficiency_point_bpd: [1200, 2500]
+    efficiency_at_bep: [0.45, 0.55]
+    min_flow_bpd: 400
+  motor:
+    hp: [80, 350]
+    voltage_v: [1200, 4000]
+    amperage_a: [25, 100]
+    poles: 2
+    power_factor: 0.82
+  cable:
+    type: "round"
+    gauge_awg: 2
+    length_ft: [2500, 6000]
+  vsd:
+    installed: true
+    frequency_range_hz: [30, 60]
+    nominal_frequency_hz: 50
+  intake:
+    type: "advanced_gas_handler"
+    gas_separator: true
+  seal:
+    type: "mechanical"
+
+installation:
+  pump_depth_ft: [2000, 4000]
+  perforations_top_ft: [2500, 4500]
+  perforations_bottom_ft: [3500, 7000]
+
+operating_envelope:
+  motor_temp_max_f: 280
+  vibration_alarm_ips: 0.4
+  vibration_shutdown_ips: 0.8
+  insulation_alarm_mohm: 200
+  insulation_shutdown_mohm: 50
+  current_overload_pct: 115
+  underload_pct: 55
+
+telemetry_ranges:
+  thp_psi: [30, 200]
+  chp_psi: [50, 400]
+  tht_f: [100, 160]
+  intake_pressure_psi: [200, 1000]
+  discharge_pressure_psi: [800, 3000]
+  motor_temp_f: [160, 260]
+  intake_temp_f: [120, 180]
+  motor_current_a: [30, 100]
+  motor_voltage_v: [1200, 4000]
+  vsd_frequency_hz: [30, 60]
+  vibration_ips: [0.03, 0.35]
+  insulation_mohm: [400, 1800]
+
+noise_profile:
+  pressure_pct: 2.5
+  temperature_pct: 0.5
+  current_pct: 4.0
+  vibration_pct: 18.0
+  flow_rate_pct: 10.0
+
+failure_modes:
+  - name: "pump_degradation"
+    mtbf_days: 550
+    onset_days: [20, 60]
+    signature:
+      efficiency_drop_pct_per_day: 0.2
+      current_rise_pct_per_day: 0.15
+      vibration_rise_pct_per_day: 0.3
+  - name: "sand_erosion"
+    mtbf_days: 400
+    onset_days: [15, 45]
+    signature:
+      vibration_rise_pct_per_day: 0.5
+      efficiency_drop_pct_per_day: 0.25
+  - name: "high_viscosity_overload"
+    mtbf_days: 300
+    onset_days: [3, 10]
+    signature:
+      current_rise_pct: 20
+      motor_temp_rise_f: 30

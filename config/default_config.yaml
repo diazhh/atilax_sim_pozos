@@ -1,0 +1,83 @@
+thingsboard:
+  url: "https://atilax.vasteix.com"
+  username: "admin@vasteix.com"
+  password: "${TB_PASSWORD}"
+
+simulation:
+  mode: "realtime"
+  historical_days: 365
+  realtime_interval_sec: 30
+  time_acceleration: 60
+  seed: 42
+
+fields:
+  - name: "Campo Boscán"
+    template: "lago_maracaibo"
+    num_macollas: 3
+    wells_per_macolla: [8, 10, 6]
+    lift_distribution:
+      SRP: 0.65
+      ESP: 0.20
+      gas_lift: 0.10
+      PCP: 0.05
+    reservoir:
+      pressure_psi: [2200, 3000]
+      temperature_f: [160, 200]
+      api_gravity: [10, 15]
+      viscosity_cp: [500, 5000]
+      water_cut_range: [0.20, 0.75]
+      gor_range: [80, 200]
+    production:
+      avg_rate_bpd: [200, 1500]
+      decline_rate_annual: [0.05, 0.15]
+
+  - name: "Campo Cerro Negro"
+    template: "faja_orinoco"
+    num_macollas: 2
+    wells_per_macolla: [12, 15]
+    lift_distribution:
+      PCP: 0.55
+      ESP: 0.35
+      SRP: 0.10
+    reservoir:
+      pressure_psi: [800, 1500]
+      temperature_f: [120, 160]
+      api_gravity: [6, 10]
+      viscosity_cp: [2000, 12000]
+      water_cut_range: [0.10, 0.50]
+      gor_range: [50, 120]
+    production:
+      avg_rate_bpd: [300, 2500]
+      decline_rate_annual: [0.03, 0.10]
+
+  - name: "Campo Anaco"
+    template: "oriente_liviano"
+    num_macollas: 2
+    wells_per_macolla: [5, 7]
+    lift_distribution:
+      gas_lift: 0.50
+      ESP: 0.35
+      SRP: 0.15
+    reservoir:
+      pressure_psi: [2500, 4000]
+      temperature_f: [200, 280]
+      api_gravity: [28, 36]
+      viscosity_cp: [1, 10]
+      water_cut_range: [0.30, 0.85]
+      gor_range: [400, 1500]
+    production:
+      avg_rate_bpd: [100, 800]
+      decline_rate_annual: [0.08, 0.20]
+
+anomalies:
+  enabled: true
+  probability_per_well_per_day: 0.02
+  types:
+    - pump_degradation
+    - sensor_drift
+    - gas_interference
+    - electrical_fluctuation
+    - water_breakthrough
+    - sand_production
+    - casing_heading
+    - stuck_sensor

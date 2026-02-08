@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  simulator:
+    build: .
+    container_name: atilax-simulator
+    restart: unless-stopped
+    environment:
+      - TB_PASSWORD=${TB_PASSWORD}
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    command: ["simulate", "--config", "config/default_config.yaml", "--mode", "realtime"]

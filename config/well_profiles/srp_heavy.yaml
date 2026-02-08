@@ -1,0 +1,96 @@
+# Perfil de pozo SRP (Bombeo Mecánico) en crudo pesado
+lift_type: "SRP"
+profile_name: "srp_heavy"
+description: "Bombeo mecánico (Sucker Rod Pump) en crudo pesado, Lago de Maracaibo"
+
+equipment:
+  pumping_unit:
+    type: "conventional"
+    manufacturer: "Lufkin"
+    model: "C-640D-365-168"
+    beam_load_capacity_lb: 36500
+    stroke_length_in: [64, 168]
+    max_spm: 12
+    prime_mover_hp: [30, 75]
+  downhole_pump:
+    type: "tubing_pump"
+    bore_in: [1.5, 2.5]
+    plunger_length_ft: 4
+    clearance_in: 0.003
+    valve_type: "ball_and_seat"
+  rod_string:
+    material: "grade_D"
+    taper: true
+    sections:
+      - diameter_in: 1.0
+        length_ft_pct: 0.30
+      - diameter_in: 0.875
+        length_ft_pct: 0.35
+      - diameter_in: 0.75
+        length_ft_pct: 0.35
+
+installation:
+  pump_depth_ft: [4000, 8000]
+  stroke_length_in: [100, 168]
+  spm: [4, 10]
+  perforations_top_ft: [4500, 9000]
+  perforations_bottom_ft: [5000, 10000]
+
+operating_envelope:
+  max_polished_rod_load_lb: 30000
+  min_polished_rod_load_lb: 2000
+  max_spm: 12
+  min_pump_fillage_pct: 50
+  fluid_level_alarm_ft: 500
+
+telemetry_ranges:
+  thp_psi: [20, 150]
+  chp_psi: [50, 300]
+  motor_current_a: [15, 60]
+  motor_power_kw: [8, 40]
+  spm: [4, 10]
+  polished_rod_load_max_lb: [8000, 25000]
+  polished_rod_load_min_lb: [1500, 6000]
+  fluid_level_ft: [800, 5000]
+  pump_fillage_pct: [50, 100]
+
+noise_profile:
+  pressure_pct: 3.0
+  current_pct: 5.0
+  load_pct: 2.0
+  spm_pct: 1.0
+  fluid_level_pct: 5.0
+  flow_rate_pct: 8.0
+
+dynamo_card:
+  points_per_cycle: 200
+  report_interval_min: 30
+  normal_shape: "full_pump"
+  area_utilization_pct: [75, 95]
+
+failure_modes:
+  - name: "gas_interference"
+    mtbf_days: 180
+    signature:
+      fillage_drop_pct: 30
+      card_shape: "gas_interference"
+      production_drop_pct: 25
+  - name: "rod_parting"
+    mtbf_days: 730
+    signature:
+      min_load_drop_pct: 60
+      card_shape: "fluid_pound"
+      production_drop_pct: 90
+  - name: "tubing_leak"
+    mtbf_days: 1095
+    onset_days: [10, 30]
+    signature:
+      thp_rise_psi: 20
+      card_shape: "tubing_leak"
+      fillage_drop_pct: 15
+  - name: "worn_pump"
+    mtbf_days: 547
+    onset_days: [30, 120]
+    signature:
+      fillage_drop_pct_per_day: 0.1
+      card_shape: "worn_pump"

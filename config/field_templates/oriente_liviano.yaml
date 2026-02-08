@@ -1,0 +1,67 @@
+# Template para campos del Oriente venezolano
+# Crudo liviano 28-36° API, gas lift y ESP predominan
+field_type: "oriente_liviano"
+description: "Cuenca Oriental - Crudo Liviano"
+
+reservoir_defaults:
+  pressure_psi: [2500, 4000]
+  temperature_f: [200, 280]
+  api_gravity: [28, 36]
+  viscosity_cp: [1, 10]
+  water_cut_range: [0.30, 0.85]
+  gor_range: [400, 1500]
+  bubble_point_psi: [1500, 3500]
+  bo_factor: [1.15, 1.50]
+  drive_mechanism: "gas_cap"
+  depth_ft: [6000, 14000]
+  permeability_md: [10, 500]
+  porosity_pct: [12, 22]
+  net_pay_ft: [10, 50]
+
+well_defaults:
+  completion_type: "vertical"
+  total_depth_md_ft: [7000, 15000]
+  total_depth_tvd_ft: [6000, 14000]
+  casing_od_in: 7.0
+  casing_id_in: 6.184
+  tubing_od_in: 2.875
+  tubing_id_in: 2.441
+  deviation_max_deg: [0, 15]
+
+lift_distribution:
+  gas_lift: 0.50
+  ESP: 0.35
+  SRP: 0.15
+
+production_defaults:
+  avg_rate_bpd: [100, 800]
+  decline_rate_annual: [0.08, 0.20]
+  ipr_model: "vogel"
+
+facility_types:
+  - type: "separator"
+    count_per_macolla: 1
+    specs:
+      pressure_psi: 150
+      capacity_bpd: 5000
+  - type: "compressor"
+    count_per_macolla: 1
+    specs:
+      capacity_mscfd: 10000
+      discharge_psi: 1500
+  - type: "tank"
+    count_per_macolla: 2
+    specs:
+      capacity_bbl: 3000
+
+naming_convention:
+  field_prefix: "AN"
+  well_prefix: "AN-{macolla}-{seq:03d}"
+  macolla_prefix: "EST-{seq:02d}"
+
+challenges:
+  - "high_gor"
+  - "gas_handling"
+  - "high_water_cut"
+  - "depletion"
+  - "scale_corrosion"

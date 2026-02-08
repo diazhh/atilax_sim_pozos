@@ -1,0 +1,82 @@
+# Perfil de pozo PCP en crudo extrapesado (Faja del Orinoco)
+lift_type: "PCP"
+profile_name: "pcp_extraheavy"
+description: "Bomba de cavidades progresivas en crudo extrapesado 6-10° API, Faja"
+
+equipment:
+  pump:
+    manufacturer: "Weatherford"
+    model: "PC Pump 400"
+    geometry: "2-3 lobe"
+    stages: [2, 4]
+    max_rate_bpd: [500, 3000]
+    max_head_ft: [3000, 6000]
+    max_differential_psi: [1500, 3000]
+    elastomer: "NBR"
+    design_temperature_f: 200
+  drive:
+    type: "surface_drive"
+    max_rpm: 500
+    max_torque_ftlb: 5000
+    motor_hp: [20, 100]
+  rod_string:
+    type: "continuous"
+    material: "carbon_steel"
+    od_in: 1.0
+
+installation:
+  pump_depth_ft: [2000, 4000]
+  perforations_top_ft: [2500, 4500]
+  perforations_bottom_ft: [3500, 7000]
+
+operating_envelope:
+  max_rpm: 400
+  max_torque_ftlb: 4500
+  min_intake_pressure_psi: 50
+  max_sand_pct: 10
+  max_temperature_f: 200
+  max_gor_scf_stb: 200
+
+telemetry_ranges:
+  thp_psi: [30, 200]
+  chp_psi: [50, 350]
+  drive_torque_ftlb: [300, 4000]
+  drive_rpm: [80, 400]
+  motor_current_a: [15, 55]
+  motor_power_kw: [8, 70]
+  intake_pressure_psi: [100, 800]
+  sand_pct: [0, 5]
+
+noise_profile:
+  pressure_pct: 2.0
+  torque_pct: 5.0
+  rpm_pct: 1.5
+  current_pct: 4.0
+  flow_rate_pct: 8.0
+  sand_pct: 25.0
+
+failure_modes:
+  - name: "elastomer_degradation"
+    mtbf_days: 450
+    onset_days: [30, 90]
+    signature:
+      torque_rise_pct_per_day: 0.2
+      efficiency_drop_pct_per_day: 0.15
+      rpm_for_same_rate_rise_pct_per_day: 0.1
+  - name: "sand_wear"
+    mtbf_days: 300
+    onset_days: [15, 45]
+    signature:
+      torque_rise_pct_per_day: 0.3
+      sand_pct_rise_per_day: 0.05
+  - name: "rod_break"
+    mtbf_days: 900
+    signature:
+      torque_drop_pct: 80
+      production_drop_pct: 95
+  - name: "stator_swell"
+    mtbf_days: 600
+    onset_days: [10, 30]
+    signature:
+      torque_rise_pct: 50
+      rpm_drop_pct: 20

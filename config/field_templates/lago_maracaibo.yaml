@@ -1,0 +1,68 @@
+# Template para campos del Lago de Maracaibo
+# Crudo pesado-medio 10-26° API, muchos pozos SRP maduros
+field_type: "lago_maracaibo"
+description: "Cuenca del Lago de Maracaibo - Crudo Pesado/Medio"
+
+reservoir_defaults:
+  pressure_psi: [2200, 3000]
+  temperature_f: [160, 200]
+  api_gravity: [10, 26]
+  viscosity_cp: [50, 5000]
+  water_cut_range: [0.20, 0.75]
+  gor_range: [80, 400]
+  bubble_point_psi: [600, 2000]
+  bo_factor: [1.05, 1.25]
+  drive_mechanism: "water_drive"
+  depth_ft: [4000, 12000]
+  permeability_md: [50, 2000]
+  porosity_pct: [15, 25]
+  net_pay_ft: [15, 80]
+
+well_defaults:
+  completion_type: "vertical"
+  total_depth_md_ft: [5000, 13000]
+  total_depth_tvd_ft: [4500, 12000]
+  casing_od_in: 7.0
+  casing_id_in: 6.184
+  tubing_od_in: 2.875
+  tubing_id_in: 2.441
+  deviation_max_deg: [0, 30]
+
+lift_distribution:
+  SRP: 0.65
+  ESP: 0.20
+  gas_lift: 0.10
+  PCP: 0.05
+
+production_defaults:
+  avg_rate_bpd: [200, 1500]
+  decline_rate_annual: [0.05, 0.15]
+  ipr_model: "vogel"
+
+facility_types:
+  - type: "separator"
+    count_per_macolla: 2
+    specs:
+      pressure_psi: 80
+      capacity_bpd: 10000
+  - type: "compressor"
+    count_per_macolla: 1
+    specs:
+      capacity_mscfd: 5000
+      discharge_psi: 1200
+  - type: "tank"
+    count_per_macolla: 2
+    specs:
+      capacity_bbl: 5000
+
+naming_convention:
+  field_prefix: "LM"
+  well_prefix: "LM-{macolla}-{seq:03d}"
+  macolla_prefix: "EST-{seq:02d}"
+
+challenges:
+  - "high_water_cut"
+  - "mature_fields"
+  - "subsidence"
+  - "lacustrine_operations"
+  - "electrical_reliability"
