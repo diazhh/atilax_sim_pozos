@@ -154,7 +154,7 @@ class ESPModel(WellModel):
             "flow_rate_bpd": round(base["flow_rate_bpd"] * efficiency_mod, 1),
             "water_cut_pct": round(base["water_cut_pct"], 2),
             "gor_scf_stb": round(base["gor_scf_stb"], 1),
-            "pump_efficiency_pct": round(pump_efficiency_pct, 1),
+            "pump_efficiency_pct": round(self._noise.gaussian(pump_efficiency_pct, 1.5, min_val=0, max_val=100), 1),
         }
 
         # Add aliases for ThingsBoard rule compatibility

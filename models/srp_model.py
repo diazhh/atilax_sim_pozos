@@ -140,7 +140,7 @@ class SRPModel(WellModel):
                     self.pump_fillage_pct * fillage_mod, 3.0, min_val=20, max_val=100
                 ), 1
             ),
-            "pump_efficiency_pct": round(pump_efficiency_pct, 1),
+            "pump_efficiency_pct": round(self._noise.gaussian(pump_efficiency_pct, 1.5, min_val=20, max_val=100), 1),
             "stroke_counter": self.stroke_counter,
             "flow_rate_bpd": round(base["flow_rate_bpd"], 1),
             "water_cut_pct": round(base["water_cut_pct"], 2),

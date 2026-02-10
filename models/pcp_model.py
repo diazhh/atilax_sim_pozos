@@ -135,7 +135,7 @@ class PCPModel(WellModel):
             "sand_pct": round(
                 self._noise.with_outliers(self.sand_pct, 25.0, min_val=0, max_val=10), 2
             ),
-            "pump_efficiency_pct": round(pump_efficiency_pct, 1),
+            "pump_efficiency_pct": round(self._noise.gaussian(pump_efficiency_pct, 1.5, min_val=30, max_val=100), 1),
         }
 
         # Add aliases for ThingsBoard rule compatibility
