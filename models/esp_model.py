@@ -89,7 +89,9 @@ class ESPModel(WellModel):
         load_factor = brake_hp / max(self.motor_hp, 1)
 
         # Electrical: current proportional to load
-        current = self.motor_amperage_a * load_factor * freq_ratio
+        # Floor at 20% no-load current (motor always draws magnetising current)
+        current = max(self.motor_amperage_a * load_factor * freq_ratio,
+                      self.motor_amperage_a * 0.2 * freq_ratio)
         voltage = self.motor_voltage_v * freq_ratio
         power_kw = UnitConverter.three_phase_power_kw(voltage, current, self.motor_power_factor)
 
