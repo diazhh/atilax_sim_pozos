@@ -126,9 +126,9 @@ class ESPModel(WellModel):
         vibration_mod = self.anomaly_modifiers.get("vibration", 1.0)
         temp_mod = self.anomaly_modifiers.get("temperature", 1.0)
 
-        # Calculate pump efficiency
+        # Calculate pump efficiency (floor at 5% — a running pump always has some efficiency)
         hydraulic_power = (discharge_p - intake_p) * flow_rate / 1714  # HP
-        pump_efficiency_pct = min(100, max(0, (hydraulic_power / max(power_kw * 1.341, 0.1)) * 100))
+        pump_efficiency_pct = min(100, max(5, (hydraulic_power / max(power_kw * 1.341, 0.1)) * 100))
 
         telemetry: dict[str, Any] = {
             "thp_psi": round(self._noise.gaussian(thp, 2.0, min_val=10), 1),
