@@ -1,0 +1,196 @@
+{
+  "ruleChain": {
+    "name": "Atilax - Publicación a Kafka",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 0,
+    "nodes": [
+      {
+        "id": "node_0",
+        "type": "org.thingsboard.rule.engine.flow.TbRuleChainInputNode",
+        "name": "Input",
+        "debugMode": false,
+        "configuration": {},
+        "layoutX": 100,
+        "layoutY": 200
+      },
+      {
+        "id": "node_1",
+        "type": "org.thingsboard.rule.engine.metadata.TbGetAttributesNode",
+        "name": "Enriquecer con Atributos",
+        "debugMode": false,
+        "configuration": {
+          "serverAttributeNames": [
+            "lifting_type",
+            "well_name",
+            "field_name",
+            "macolla_name",
+            "well_code_pdvsa"
+          ],
+          "clientAttributeNames": [],
+          "latestTsKeyNames": [],
+          "fetchTo": "METADATA"
+        },
+        "layoutX": 300,
+        "layoutY": 200
+      },
+      {
+        "id": "node_2",
+        "type": "org.thingsboard.rule.engine.metadata.TbGetRelatedAttributeNode",
+        "name": "Atributos del Pozo",
+        "debugMode": false,
+        "configuration": {
+          "relationsQuery": {
+            "direction": "FROM",
+            "maxLevel": 1,
+            "fetchLastLevelOnly": false,
+            "relationTypeGroup": "COMMON",
+            "relationType": "Contains",
+            "entityTypes": [
+              "ASSET"
+            ]
+          },
+          "serverAttributeNames": [
+            "reservoir_pressure_psi",
+            "api_gravity",
+            "water_cut_pct",
+            "productivity_index_bpd_psi"
+          ],
+          "clientAttributeNames": [],
+          "latestTsKeyNames": [],
+          "fetchTo": "METADATA"
+        },
+        "layoutX": 550,
+        "layoutY": 200
+      },
+      {
+        "id": "node_3",
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Formatear Mensaje Kafka",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "var kafkaMsg = {\n    deviceId: metadata.deviceId,\n    deviceName: metadata.deviceName,\n    deviceType: metadata.ss_lifting_type || 'unknown',\n    wellName: metadata.ss_well_name || '',\n    wellCode: metadata.ss_well_code_pdvsa || '',\n    fieldName: metadata.ss_field_name || '',\n    macollaName: metadata.ss_macolla_name || '',\n    timestamp: metadata.ts,\n    telemetry: msg,\n    wellProperties: {\n        reservoirPressure: Number(metadata.ss_reservoir_pressure_psi) || null,\n        apiGravity: Number(metadata.ss_api_gravity) || null,\n        waterCut: Number(metadata.ss_water_cut_pct) || null,\n        productivityIndex: Number(metadata.ss_productivity_index_bpd_psi) || null\n    }\n};\nreturn {msg: kafkaMsg, metadata: metadata, msgType: msgType};"
+        },
+        "layoutX": 800,
+        "layoutY": 200
+      },
+      {
+        "id": "node_4",
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Determinar Topic",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "var liftType = (metadata.ss_lifting_type || 'unknown').toLowerCase();\nvar topicMap = {\n    'esp': 'atilax.telemetry.esp',\n    'srp': 'atilax.telemetry.srp',\n    'gas_lift': 'atilax.telemetry.gaslift',\n    'gaslift': 'atilax.telemetry.gaslift',\n    'pcp': 'atilax.telemetry.pcp'\n};\nmetadata.kafkaTopic = topicMap[liftType] || 'atilax.telemetry.unknown';\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        },
+        "layoutX": 1050,
+        "layoutY": 200
+      },
+      {
+        "id": "node_5",
+        "type": "org.thingsboard.rule.engine.kafka.TbKafkaNode",
+        "name": "Publicar a Kafka",
+        "debugMode": false,
+        "configuration": {
+          "topicPattern": "${kafkaTopic}",
+          "bootstrapServers": "kafka-broker.atilax.local:9092",
+          "retries": 3,
+          "batchSize": 16384,
+          "linger": 5,
+          "bufferMemory": 33554432,
+          "acks": "all",
+          "keySerializer": "org.apache.kafka.common.serialization.StringSerializer",
+          "valueSerializer": "org.apache.kafka.common.serialization.StringSerializer",
+          "addMetadataKeyValuesAsKafkaHeaders": false,
+          "kafkaHeadersCharset": "UTF-8"
+        },
+        "layoutX": 1300,
+        "layoutY": 200
+      },
+      {
+        "id": "node_6",
+        "type": "org.thingsboard.rule.engine.action.TbLogNode",
+        "name": "Log Kafka OK",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "return 'Kafka OK → Topic: ' + metadata.kafkaTopic + ' | Device: ' + metadata.deviceName;"
+        },
+        "layoutX": 1550,
+        "layoutY": 150
+      },
+      {
+        "id": "node_7",
+        "type": "org.thingsboard.rule.engine.action.TbLogNode",
+        "name": "Log Kafka Error",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "return 'KAFKA ERROR → Topic: ' + metadata.kafkaTopic + ' | Device: ' + metadata.deviceName + ' | Error: ' + metadata.error;"
+        },
+        "layoutX": 1550,
+        "layoutY": 300
+      },
+      {
+        "id": "node_8",
+        "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+        "name": "Alarma Error Kafka",
+        "debugMode": false,
+        "configuration": {
+          "alarmType": "KAFKA_PUBLISH_ERROR",
+          "severity": "MAJOR",
+          "propagate": true,
+          "propagateToOwner": true,
+          "alarmDetailsBuildJs": "var details = {};\ndetails.kafkaTopic = metadata.kafkaTopic || 'unknown';\ndetails.deviceName = metadata.deviceName || 'unknown';\ndetails.error = metadata.error || 'Unknown error';\ndetails.timestamp = metadata.ts || new Date().getTime();\ndetails.description = 'Error publicando a Kafka: ' + details.error;\nreturn details;"
+        },
+        "layoutX": 1550,
+        "layoutY": 450
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 3,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 4,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 5,
+        "toIndex": 6,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 5,
+        "toIndex": 7,
+        "type": "Failure"
+      },
+      {
+        "fromIndex": 7,
+        "toIndex": 8,
+        "type": "Success"
+      }
+    ],
+    "ruleChainConnections": []
+  }
+}

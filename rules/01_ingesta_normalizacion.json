@@ -1,0 +1,215 @@
+{
+  "ruleChain": {
+    "name": "Atilax - Ingesta y Normalización",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": true,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 0,
+    "nodes": [
+      {
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "Message Type Switch",
+        "debugMode": false,
+        "singletonMode": false,
+        "configuration": {},
+        "additionalInfo": {
+          "layoutX": 200,
+          "layoutY": 250,
+          "description": "Enruta mensajes por tipo: telemetría, atributos, RPC, etc."
+        }
+      },
+      {
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Validación de Telemetría",
+        "debugMode": false,
+        "singletonMode": false,
+        "configuration": {
+          "jsScript": "var msg = JSON.parse(JSON.stringify(msg));\nvar metadata = JSON.parse(JSON.stringify(metadata));\nvar valid = true;\nvar errors = [];\n\n// Validación de frecuencia (0-100 Hz)\nif (msg.frequency_hz !== undefined && (msg.frequency_hz < 0 || msg.frequency_hz > 100)) {\n    valid = false;\n    errors.push('frequency_hz fuera de rango: ' + msg.frequency_hz);\n}\n\n// Validación de corriente del motor (0-500 A)\nif (msg.motor_current_a !== undefined && (msg.motor_current_a < 0 || msg.motor_current_a > 500)) {\n    valid = false;\n    errors.push('motor_current_a fuera de rango: ' + msg.motor_current_a);\n}\n\n// Validación de temperatura motor (-10 a 350 °F)\nif (msg.motor_temperature_f !== undefined && (msg.motor_temperature_f < -10 || msg.motor_temperature_f > 350)) {\n    valid = false;\n    errors.push('motor_temperature_f fuera de rango: ' + msg.motor_temperature_f);\n}\n\n// Validación de presión tubing (0-5000 psi)\nif (msg.tubing_pressure_psi !== undefined && (msg.tubing_pressure_psi < 0 || msg.tubing_pressure_psi > 5000)) {\n    valid = false;\n    errors.push('tubing_pressure_psi fuera de rango: ' + msg.tubing_pressure_psi);\n}\n\n// Validación de presión casing (0-5000 psi)\nif (msg.casing_pressure_psi !== undefined && (msg.casing_pressure_psi < 0 || msg.casing_pressure_psi > 5000)) {\n    valid = false;\n    errors.push('casing_pressure_psi fuera de rango: ' + msg.casing_pressure_psi);\n}\n\n// Validación de presión intake (0-5000 psi)\nif (msg.intake_pressure_psi !== undefined && (msg.intake_pressure_psi < 0 || msg.intake_pressure_psi > 5000)) {\n    valid = false;\n    errors.push('intake_pressure_psi fuera de rango: ' + msg.intake_pressure_psi);\n}\n\n// Validación de vibración (0-50 ips)\nif (msg.vibration_ips !== undefined && (msg.vibration_ips < 0 || msg.vibration_ips > 50)) {\n    valid = false;\n    errors.push('vibration_ips fuera de rango: ' + msg.vibration_ips);\n}\n\n// Validación de flow rate (0-10000 bpd)\nif (msg.flow_rate_bpd !== undefined && (msg.flow_rate_bpd < 0 || msg.flow_rate_bpd > 10000)) {\n    valid = false;\n    errors.push('flow_rate_bpd fuera de rango: ' + msg.flow_rate_bpd);\n}\n\n// Validación de potencia (0-1000 kW)\nif (msg.motor_power_kw !== undefined && (msg.motor_power_kw < 0 || msg.motor_power_kw > 1000)) {\n    valid = false;\n    errors.push('motor_power_kw fuera de rango: ' + msg.motor_power_kw);\n}\n\n// Validación de SPM para SRP (0-20)\nif (msg.spm !== undefined && (msg.spm < 0 || msg.spm > 20)) {\n    valid = false;\n    errors.push('spm fuera de rango: ' + msg.spm);\n}\n\n// Validación de tasa de inyección gas lift (0-5000 MSCFD)\nif (msg.injection_rate_mscfd !== undefined && (msg.injection_rate_mscfd < 0 || msg.injection_rate_mscfd > 5000)) {\n    valid = false;\n    errors.push('injection_rate_mscfd fuera de rango: ' + msg.injection_rate_mscfd);\n}\n\n// Validación de RPM para PCP (0-600)\nif (msg.speed_rpm !== undefined && (msg.speed_rpm < 0 || msg.speed_rpm > 600)) {\n    valid = false;\n    errors.push('speed_rpm fuera de rango: ' + msg.speed_rpm);\n}\n\nif (!valid) {\n    metadata.validationErrors = JSON.stringify(errors);\n    metadata.validationStatus = 'FAILED';\n} else {\n    metadata.validationStatus = 'PASSED';\n}\n\nreturn {msg: msg, metadata: metadata, msgType: valid ? 'POST_TELEMETRY_REQUEST' : 'VALIDATION_ERROR'};"
+        },
+        "additionalInfo": {
+          "layoutX": 500,
+          "layoutY": 150,
+          "description": "Valida rangos de telemetría para todos los tipos de levantamiento"
+        }
+      },
+      {
+        "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+        "name": "¿Validación OK?",
+        "debugMode": false,
+        "singletonMode": false,
+        "configuration": {
+          "jsScript": "return metadata.validationStatus === 'PASSED';"
+        },
+        "additionalInfo": {
+          "layoutX": 800,
+          "layoutY": 150,
+          "description": ""
+        }
+      },
+      {
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "Guardar Telemetría",
+        "debugMode": false,
+        "singletonMode": false,
+        "configuration": {
+          "defaultTTL": 0,
+          "skipLatestPersistence": false,
+          "useServerTs": false
+        },
+        "additionalInfo": {
+          "layoutX": 1100,
+          "layoutY": 100,
+          "description": ""
+        }
+      },
+      {
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgAttributesNode",
+        "name": "Guardar Atributos Cliente",
+        "debugMode": false,
+        "singletonMode": false,
+        "configuration": {
+          "scope": "CLIENT_SCOPE",
+          "notifyDevice": false
+        },
+        "additionalInfo": {
+          "layoutX": 500,
+          "layoutY": 400,
+          "description": ""
+        }
+      },
+      {
+        "type": "org.thingsboard.rule.engine.action.TbLogNode",
+        "name": "Log Telemetría",
+        "debugMode": false,
+        "singletonMode": false,
+        "configuration": {
+          "jsScript": "return 'Telemetría recibida de ' + metadata.deviceName + ': ' + JSON.stringify(msg).substring(0, 200);"
+        },
+        "additionalInfo": {
+          "layoutX": 1100,
+          "layoutY": 250,
+          "description": ""
+        }
+      },
+      {
+        "type": "org.thingsboard.rule.engine.action.TbLogNode",
+        "name": "Log Error Validación",
+        "debugMode": false,
+        "singletonMode": false,
+        "configuration": {
+          "jsScript": "return 'ERROR VALIDACIÓN - Device: ' + metadata.deviceName + ' | Errores: ' + metadata.validationErrors;"
+        },
+        "additionalInfo": {
+          "layoutX": 800,
+          "layoutY": 350,
+          "description": ""
+        }
+      },
+      {
+        "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+        "name": "Alarma Datos Inválidos",
+        "debugMode": false,
+        "singletonMode": false,
+        "configuration": {
+          "alarmType": "INVALID_TELEMETRY_DATA",
+          "severity": "WARNING",
+          "propagate": true,
+          "propagateToOwner": true,
+          "propagateToTenant": false,
+          "useMessageAlarmData": false,
+          "alarmDetailsBuildJs": "var details = {};\ndetails.deviceName = metadata.deviceName;\ndetails.errors = metadata.validationErrors;\ndetails.timestamp = metadata.ts;\nreturn details;"
+        },
+        "additionalInfo": {
+          "layoutX": 1100,
+          "layoutY": 350,
+          "description": ""
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Post telemetry"
+      },
+      {
+        "fromIndex": 0,
+        "toIndex": 4,
+        "type": "Post attributes"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 3,
+        "type": "True"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 6,
+        "type": "False"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 6,
+        "toIndex": 7,
+        "type": "Success"
+      }
+    ],
+    "ruleChainConnections": [
+      {
+        "fromIndex": 3,
+        "targetRuleChainId": {
+          "entityType": "RULE_CHAIN",
+          "id": "PLACEHOLDER_PROPAGACION"
+        },
+        "additionalInfo": {
+          "ruleChainNodeId": "rule-chain-node-propagacion",
+          "layoutX": 1400,
+          "layoutY": 100,
+          "description": "→ Propagación Device→Asset"
+        },
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "targetRuleChainId": {
+          "entityType": "RULE_CHAIN",
+          "id": "PLACEHOLDER_ALARMAS"
+        },
+        "additionalInfo": {
+          "ruleChainNodeId": "rule-chain-node-alarmas",
+          "layoutX": 1400,
+          "layoutY": 200,
+          "description": "→ Alarmas Operativas"
+        },
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "targetRuleChainId": {
+          "entityType": "RULE_CHAIN",
+          "id": "PLACEHOLDER_KAFKA"
+        },
+        "additionalInfo": {
+          "ruleChainNodeId": "rule-chain-node-kafka",
+          "layoutX": 1400,
+          "layoutY": 300,
+          "description": "→ Publicación a Kafka"
+        },
+        "type": "Success"
+      }
+    ]
+  }
+}

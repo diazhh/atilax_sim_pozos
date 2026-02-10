@@ -1,0 +1,874 @@
+{
+  "dashboard": {
+    "name": "Atilax - Pozo Individual",
+    "title": "Atilax - Pozo Individual",
+    "description": "Dashboard detallado para monitoreo de un pozo individual con análisis de producción, presiones, estado del equipo y recomendaciones de optimización",
+    "mobileHide": false,
+    "isTemplate": false,
+    "templateSearchText": "atilax pozo individual well",
+    "gridSettings": {
+      "columns": 24,
+      "margin": 10,
+      "autoFillHeight": true
+    },
+    "entityAliases": [
+      {
+        "id": "alias_pozo_1",
+        "alias": "selected_well",
+        "filter": {
+          "type": "stateEntity",
+          "singleEntity": true,
+          "stateEntityParamName": "well"
+        }
+      },
+      {
+        "id": "alias_pozo_2",
+        "alias": "well_devices",
+        "filter": {
+          "type": "relationsQuery",
+          "rootStateEntity": true,
+          "stateEntityParamName": "well",
+          "direction": "FROM",
+          "maxLevel": 1,
+          "filters": [
+            {
+              "relationType": "Contains",
+              "entityTypes": [
+                "DEVICE"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "filters": [],
+    "timewindow": {
+      "realtime": {
+        "interval": 30000,
+        "timewindowMs": 3600000
+      }
+    },
+    "dashboardLayout": "grid",
+    "widgets": [
+      {
+        "id": "w1_produccion_actual",
+        "type": "latest",
+        "title": "Producción Actual",
+        "sizeX": 6,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1",
+              "dataKeys": [
+                {
+                  "name": "flow_rate_bpd",
+                  "type": "timeseries",
+                  "label": "Producción Actual",
+                  "color": "#1E3A5F",
+                  "decimals": 0,
+                  "units": "BPD"
+                }
+              ]
+            }
+          ],
+          "imageHeight": null,
+          "imageWidth": null,
+          "showLegend": false,
+          "decimals": 0,
+          "noDataText": "N/A",
+          "fontSize": 32,
+          "alignment": "center",
+          "widgetNameFont": {
+            "family": "Roboto",
+            "size": 14,
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "valueFont": {
+            "family": "Roboto",
+            "size": 28,
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "showUnits": true
+        },
+        "row": 0,
+        "col": 0
+      },
+      {
+        "id": "w2_estado_pozo",
+        "type": "latest",
+        "title": "Estado del Pozo",
+        "sizeX": 6,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1",
+              "dataKeys": [
+                {
+                  "name": "well_status",
+                  "type": "attribute",
+                  "label": "Estado",
+                  "color": "#666666",
+                  "decimals": 0
+                }
+              ]
+            }
+          ],
+          "imageHeight": null,
+          "imageWidth": null,
+          "showLegend": false,
+          "decimals": 0,
+          "noDataText": "N/A",
+          "fontSize": 18,
+          "alignment": "center",
+          "widgetNameFont": {
+            "family": "Roboto",
+            "size": 14,
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "valueFont": {
+            "family": "Roboto",
+            "size": 20,
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "colorFunction": "if (data && data.well_status) { if (data.well_status === 'active') return '#27AE60'; if (data.well_status === 'testing') return '#F5A623'; if (data.well_status === 'shutdown') return '#E74C3C'; } return '#666666';",
+          "showUnits": false
+        },
+        "row": 0,
+        "col": 6
+      },
+      {
+        "id": "w3_tipo_levantamiento",
+        "type": "latest",
+        "title": "Tipo de Levantamiento",
+        "sizeX": 6,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1",
+              "dataKeys": [
+                {
+                  "name": "lifting_type",
+                  "type": "attribute",
+                  "label": "Levantamiento",
+                  "color": "#666666",
+                  "decimals": 0
+                }
+              ]
+            }
+          ],
+          "imageHeight": null,
+          "imageWidth": null,
+          "showLegend": false,
+          "decimals": 0,
+          "noDataText": "N/A",
+          "fontSize": 16,
+          "alignment": "center",
+          "widgetNameFont": {
+            "family": "Roboto",
+            "size": 14,
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "valueFont": {
+            "family": "Roboto",
+            "size": 18,
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "showUnits": false
+        },
+        "row": 0,
+        "col": 12
+      },
+      {
+        "id": "w4_ultima_actualizacion",
+        "type": "latest",
+        "title": "Última Actualización",
+        "sizeX": 6,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1",
+              "dataKeys": [
+                {
+                  "name": "last_telemetry_ts",
+                  "type": "timeseries",
+                  "label": "Última Lectura",
+                  "color": "#1E3A5F",
+                  "decimals": 0
+                }
+              ]
+            }
+          ],
+          "imageHeight": null,
+          "imageWidth": null,
+          "showLegend": false,
+          "decimals": 0,
+          "noDataText": "N/A",
+          "fontSize": 14,
+          "alignment": "center",
+          "widgetNameFont": {
+            "family": "Roboto",
+            "size": 14,
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "valueFont": {
+            "family": "Roboto",
+            "size": 16,
+            "bold": false,
+            "italic": false,
+            "underline": false
+          },
+          "dateFormat": "MMM dd, yyyy HH:mm",
+          "showUnits": false
+        },
+        "row": 0,
+        "col": 18
+      },
+      {
+        "id": "w5_produccion_timeseries",
+        "type": "timeseries",
+        "title": "Producción (últimas 48h)",
+        "sizeX": 12,
+        "sizeY": 7,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1",
+              "dataKeys": [
+                {
+                  "name": "flow_rate_bpd",
+                  "type": "timeseries",
+                  "label": "Producción",
+                  "color": "#1E3A5F",
+                  "decimals": 1,
+                  "units": "BPD"
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "fixed": {
+              "startTimeMs": 0,
+              "endTimeMs": 0
+            },
+            "realtime": {
+              "interval": 30000,
+              "timewindowMs": 172800000
+            }
+          },
+          "showLegend": true,
+          "legendConfig": {
+            "position": "bottom",
+            "showValues": true
+          },
+          "thresholds": [],
+          "stacking": false,
+          "decimals": 1,
+          "noDataText": "No data",
+          "aggregationType": "AVG",
+          "aggregationInterval": 300000,
+          "chartType": "line",
+          "fillArea": true,
+          "smooth": false,
+          "showPoints": false,
+          "pointShape": "circle",
+          "pointSize": 4,
+          "tooltipValueType": "individual",
+          "yAxis": {
+            "id": "default_yaxis",
+            "type": "linear",
+            "label": "BPD",
+            "position": "left"
+          },
+          "xAxis": {
+            "type": "time"
+          }
+        },
+        "row": 3,
+        "col": 0
+      },
+      {
+        "id": "w6_presiones",
+        "type": "timeseries",
+        "title": "Presiones",
+        "sizeX": 12,
+        "sizeY": 7,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1",
+              "dataKeys": [
+                {
+                  "name": "tubing_pressure_psi",
+                  "type": "timeseries",
+                  "label": "Presión en Tubería",
+                  "color": "#E74C3C",
+                  "decimals": 1,
+                  "units": "PSI"
+                },
+                {
+                  "name": "casing_pressure_psi",
+                  "type": "timeseries",
+                  "label": "Presión en Revestidor",
+                  "color": "#3498DB",
+                  "decimals": 1,
+                  "units": "PSI"
+                },
+                {
+                  "name": "intake_pressure_psi",
+                  "type": "timeseries",
+                  "label": "Presión de Entrada",
+                  "color": "#F5A623",
+                  "decimals": 1,
+                  "units": "PSI"
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "interval": 30000,
+              "timewindowMs": 172800000
+            }
+          },
+          "showLegend": true,
+          "legendConfig": {
+            "position": "bottom",
+            "showValues": true
+          },
+          "thresholds": [],
+          "stacking": false,
+          "decimals": 1,
+          "noDataText": "No data",
+          "aggregationType": "AVG",
+          "aggregationInterval": 300000,
+          "chartType": "line",
+          "fillArea": false,
+          "smooth": false,
+          "showPoints": false,
+          "pointShape": "circle",
+          "pointSize": 4,
+          "tooltipValueType": "individual",
+          "yAxis": {
+            "id": "default_yaxis",
+            "type": "linear",
+            "label": "PSI",
+            "position": "left"
+          },
+          "xAxis": {
+            "type": "time"
+          }
+        },
+        "row": 3,
+        "col": 12
+      },
+      {
+        "id": "w7_temperatura_motor",
+        "type": "gauge",
+        "title": "Temperatura Motor",
+        "sizeX": 6,
+        "sizeY": 5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1",
+              "dataKeys": [
+                {
+                  "name": "motor_temperature_f",
+                  "type": "timeseries",
+                  "label": "Temperatura",
+                  "color": "#1E3A5F",
+                  "decimals": 1,
+                  "units": "°F"
+                }
+              ]
+            }
+          ],
+          "gaugeType": "radialGauge",
+          "min": 0,
+          "max": 350,
+          "decimals": 1,
+          "donutStartAngle": 0,
+          "donutEndAngle": 360,
+          "showValue": true,
+          "showMinMax": true,
+          "gaugeRadius": 75,
+          "ticksValue": 10,
+          "thresholds": [
+            {
+              "from": 0,
+              "to": 200,
+              "color": "#27AE60"
+            },
+            {
+              "from": 200,
+              "to": 280,
+              "color": "#F5A623"
+            },
+            {
+              "from": 280,
+              "to": 350,
+              "color": "#E74C3C"
+            }
+          ]
+        },
+        "row": 10,
+        "col": 0
+      },
+      {
+        "id": "w8_vibracion",
+        "type": "gauge",
+        "title": "Vibración",
+        "sizeX": 6,
+        "sizeY": 5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1",
+              "dataKeys": [
+                {
+                  "name": "vibration_ips",
+                  "type": "timeseries",
+                  "label": "Vibración",
+                  "color": "#1E3A5F",
+                  "decimals": 2,
+                  "units": "ips"
+                }
+              ]
+            }
+          ],
+          "gaugeType": "radialGauge",
+          "min": 0,
+          "max": 15,
+          "decimals": 2,
+          "donutStartAngle": 0,
+          "donutEndAngle": 360,
+          "showValue": true,
+          "showMinMax": true,
+          "gaugeRadius": 75,
+          "ticksValue": 1.5,
+          "thresholds": [
+            {
+              "from": 0,
+              "to": 5,
+              "color": "#27AE60"
+            },
+            {
+              "from": 5,
+              "to": 8,
+              "color": "#F5A623"
+            },
+            {
+              "from": 8,
+              "to": 15,
+              "color": "#E74C3C"
+            }
+          ]
+        },
+        "row": 10,
+        "col": 6
+      },
+      {
+        "id": "w9_frecuencia",
+        "type": "gauge",
+        "title": "Frecuencia VSD",
+        "sizeX": 6,
+        "sizeY": 5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1",
+              "dataKeys": [
+                {
+                  "name": "frequency_hz",
+                  "type": "timeseries",
+                  "label": "Frecuencia",
+                  "color": "#1E3A5F",
+                  "decimals": 1,
+                  "units": "Hz"
+                }
+              ]
+            }
+          ],
+          "gaugeType": "radialGauge",
+          "min": 0,
+          "max": 65,
+          "decimals": 1,
+          "donutStartAngle": 0,
+          "donutEndAngle": 360,
+          "showValue": true,
+          "showMinMax": true,
+          "gaugeRadius": 75,
+          "ticksValue": 5,
+          "thresholds": [
+            {
+              "from": 0,
+              "to": 30,
+              "color": "#F5A623"
+            },
+            {
+              "from": 30,
+              "to": 55,
+              "color": "#27AE60"
+            },
+            {
+              "from": 55,
+              "to": 65,
+              "color": "#E74C3C"
+            }
+          ]
+        },
+        "row": 10,
+        "col": 12
+      },
+      {
+        "id": "w10_corriente_motor",
+        "type": "gauge",
+        "title": "Corriente Motor",
+        "sizeX": 6,
+        "sizeY": 5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1",
+              "dataKeys": [
+                {
+                  "name": "motor_current_a",
+                  "type": "timeseries",
+                  "label": "Corriente",
+                  "color": "#1E3A5F",
+                  "decimals": 1,
+                  "units": "A"
+                }
+              ]
+            }
+          ],
+          "gaugeType": "radialGauge",
+          "min": 0,
+          "max": 300,
+          "decimals": 1,
+          "donutStartAngle": 0,
+          "donutEndAngle": 360,
+          "showValue": true,
+          "showMinMax": true,
+          "gaugeRadius": 75,
+          "ticksValue": 30,
+          "thresholds": [
+            {
+              "from": 0,
+              "to": 180,
+              "color": "#27AE60"
+            },
+            {
+              "from": 180,
+              "to": 240,
+              "color": "#F5A623"
+            },
+            {
+              "from": 240,
+              "to": 300,
+              "color": "#E74C3C"
+            }
+          ]
+        },
+        "row": 10,
+        "col": 18
+      },
+      {
+        "id": "w11_recomendacion_optimizacion",
+        "type": "html",
+        "title": "Recomendación de Optimización",
+        "sizeX": 12,
+        "sizeY": 6,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1",
+              "dataKeys": [
+                {
+                  "name": "opt_recommended_frequency_hz",
+                  "type": "attribute",
+                  "label": "Frecuencia Recomendada"
+                },
+                {
+                  "name": "opt_expected_production_bpd",
+                  "type": "attribute",
+                  "label": "Producción Esperada"
+                },
+                {
+                  "name": "opt_production_gain_pct",
+                  "type": "attribute",
+                  "label": "Ganancia de Producción"
+                },
+                {
+                  "name": "opt_confidence_pct",
+                  "type": "attribute",
+                  "label": "Confianza"
+                },
+                {
+                  "name": "opt_recommended_action",
+                  "type": "attribute",
+                  "label": "Acción Recomendada"
+                },
+                {
+                  "name": "opt_status",
+                  "type": "attribute",
+                  "label": "Estado"
+                }
+              ]
+            }
+          ],
+          "htmlTemplate": "<div style='padding: 20px; background-color: #EBF5FB; border-radius: 8px; border-left: 4px solid #3498DB;'>\n  <div style='font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #1E3A5F;'>Recomendación de Optimización</div>\n  <div style='display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;'>\n    <div>\n      <div style='font-size: 12px; color: #666; margin-bottom: 5px;'>Frecuencia Recomendada</div>\n      <div style='font-size: 20px; font-weight: bold; color: #1E3A5F;'>${opt_recommended_frequency_hz || 'N/A'} Hz</div>\n    </div>\n    <div>\n      <div style='font-size: 12px; color: #666; margin-bottom: 5px;'>Producción Esperada</div>\n      <div style='font-size: 20px; font-weight: bold; color: #27AE60;'>${opt_expected_production_bpd || 'N/A'} BPD</div>\n    </div>\n    <div>\n      <div style='font-size: 12px; color: #666; margin-bottom: 5px;'>Ganancia de Producción</div>\n      <div style='font-size: 20px; font-weight: bold; color: #E74C3C;'>${opt_production_gain_pct || 'N/A'}%</div>\n    </div>\n    <div>\n      <div style='font-size: 12px; color: #666; margin-bottom: 5px;'>Nivel de Confianza</div>\n      <div style='font-size: 20px; font-weight: bold; color: #F5A623;'>${opt_confidence_pct || 'N/A'}%</div>\n    </div>\n  </div>\n  <div style='background-color: white; padding: 12px; border-radius: 4px; margin-bottom: 10px;'>\n    <div style='font-size: 12px; color: #666; margin-bottom: 5px;'>Acción Recomendada</div>\n    <div style='font-size: 14px; color: #1E3A5F; font-weight: 500;'>${opt_recommended_action || 'Sin recomendaciones'}</div>\n  </div>\n  <div style='background-color: white; padding: 12px; border-radius: 4px;'>\n    <div style='font-size: 12px; color: #666; margin-bottom: 5px;'>Estado</div>\n    <div style='font-size: 14px; font-weight: 500; ${opt_status === 'recommended' ? \"color: #27AE60;\" : \"color: #95A5A6;\"}\">${opt_status || 'N/A'}</div>\n  </div>\n</div>",
+          "noDataDisplayMessageText": "Sin datos de optimización disponibles"
+        },
+        "row": 15,
+        "col": 0
+      },
+      {
+        "id": "w12_dca_pronostico",
+        "type": "timeseries",
+        "title": "Análisis de Declinación (DCA)",
+        "sizeX": 12,
+        "sizeY": 6,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1",
+              "dataKeys": [
+                {
+                  "name": "flow_rate_bpd",
+                  "type": "timeseries",
+                  "label": "Producción Real",
+                  "color": "#1E3A5F",
+                  "decimals": 1,
+                  "units": "BPD"
+                },
+                {
+                  "name": "dca_forecast_json",
+                  "type": "attribute",
+                  "label": "Pronóstico DCA",
+                  "color": "#95A5A6",
+                  "decimals": 1,
+                  "units": "BPD"
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "interval": 30000,
+              "timewindowMs": 15552000000
+            }
+          },
+          "showLegend": true,
+          "legendConfig": {
+            "position": "bottom",
+            "showValues": true
+          },
+          "thresholds": [],
+          "stacking": false,
+          "decimals": 1,
+          "noDataText": "No data",
+          "aggregationType": "AVG",
+          "aggregationInterval": 3600000,
+          "chartType": "line",
+          "fillArea": false,
+          "smooth": true,
+          "showPoints": false,
+          "pointShape": "circle",
+          "pointSize": 4,
+          "tooltipValueType": "individual",
+          "yAxis": {
+            "id": "default_yaxis",
+            "type": "linear",
+            "label": "BPD",
+            "position": "left"
+          },
+          "xAxis": {
+            "type": "time"
+          }
+        },
+        "row": 15,
+        "col": 12
+      },
+      {
+        "id": "w13_alarmas_activas",
+        "type": "alarm",
+        "title": "Alarmas del Pozo",
+        "sizeX": 12,
+        "sizeY": 6,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1"
+            }
+          ],
+          "alarmSource": {
+            "type": "entity",
+            "entityAliasId": "alias_pozo_1"
+          },
+          "pageSize": 10,
+          "statusFilters": [
+            "ACTIVE_UNACK",
+            "ACTIVE_ACK"
+          ],
+          "displayColumns": [
+            {
+              "key": "createdTime",
+              "label": "Fecha Creación",
+              "type": "date"
+            },
+            {
+              "key": "type",
+              "label": "Tipo",
+              "type": "string"
+            },
+            {
+              "key": "severity",
+              "label": "Severidad",
+              "type": "string"
+            },
+            {
+              "key": "status",
+              "label": "Estado",
+              "type": "string"
+            },
+            {
+              "key": "details",
+              "label": "Detalles",
+              "type": "string"
+            }
+          ],
+          "enableAcknowledge": true,
+          "enableClear": true,
+          "enableSearch": true,
+          "enableSelectColumnDisplay": false,
+          "enableStickyHeader": true,
+          "noDataDisplayMessageText": "Sin alarmas activas"
+        },
+        "row": 21,
+        "col": 0
+      },
+      {
+        "id": "w14_parametros_pozo",
+        "type": "attributes",
+        "title": "Parámetros del Pozo",
+        "sizeX": 12,
+        "sizeY": 6,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_pozo_1",
+              "dataKeys": [
+                {
+                  "name": "well_code_pdvsa",
+                  "type": "attribute",
+                  "label": "Código PDVSA"
+                },
+                {
+                  "name": "lifting_type",
+                  "type": "attribute",
+                  "label": "Tipo de Levantamiento"
+                },
+                {
+                  "name": "total_depth_ft",
+                  "type": "attribute",
+                  "label": "Profundidad Total (ft)"
+                },
+                {
+                  "name": "reservoir_pressure_psi",
+                  "type": "attribute",
+                  "label": "Presión del Yacimiento (psi)"
+                },
+                {
+                  "name": "api_gravity",
+                  "type": "attribute",
+                  "label": "Gravedad API"
+                },
+                {
+                  "name": "water_cut_pct",
+                  "type": "attribute",
+                  "label": "Corte de Agua (%)"
+                },
+                {
+                  "name": "productivity_index_bpd_psi",
+                  "type": "attribute",
+                  "label": "Índice de Productividad (BPD/psi)"
+                },
+                {
+                  "name": "esp_model",
+                  "type": "attribute",
+                  "label": "Modelo de Equipamiento"
+                },
+                {
+                  "name": "completion_type",
+                  "type": "attribute",
+                  "label": "Tipo de Completamiento"
+                }
+              ]
+            }
+          ],
+          "attributeDisplayMode": "list",
+          "showTitle": true,
+          "titleFont": {
+            "family": "Roboto",
+            "size": 14,
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "labelFont": {
+            "family": "Roboto",
+            "size": 12,
+            "bold": false,
+            "italic": false,
+            "underline": false
+          },
+          "valueFont": {
+            "family": "Roboto",
+            "size": 12,
+            "bold": true,
+            "italic": false,
+            "underline": false
+          },
+          "enableSearch": true,
+          "enableSelectColumnDisplay": false,
+          "noDataDisplayMessageText": "Sin parámetros disponibles"
+        },
+        "row": 21,
+        "col": 12
+      }
+    ]
+  }
+}

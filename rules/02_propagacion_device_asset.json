@@ -1,0 +1,203 @@
+{
+  "ruleChain": {
+    "name": "Atilax - Propagación Device→Asset",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 0,
+    "nodes": [
+      {
+        "id": "node_0",
+        "clazz": "org.thingsboard.rule.engine.flow.TbRuleChainInputNode",
+        "name": "Input",
+        "debugMode": false,
+        "singletonMode": false,
+        "queueName": null,
+        "layoutX": 100,
+        "layoutY": 200,
+        "configuration": {}
+      },
+      {
+        "id": "node_1",
+        "clazz": "org.thingsboard.rule.engine.metadata.TbGetAttributesNode",
+        "name": "Obtener Tipo Dispositivo",
+        "debugMode": false,
+        "singletonMode": false,
+        "queueName": null,
+        "layoutX": 300,
+        "layoutY": 200,
+        "configuration": {
+          "clientAttributeNames": [],
+          "sharedAttributeNames": [],
+          "serverAttributeNames": ["deviceType", "liftingType"],
+          "latestTsKeyNames": [],
+          "tellFailureIfAbsent": false,
+          "getLatestValueWithTs": false,
+          "fetchTo": "METADATA"
+        }
+      },
+      {
+        "id": "node_2",
+        "clazz": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Filtrar Métricas Propagación",
+        "debugMode": false,
+        "singletonMode": false,
+        "queueName": null,
+        "layoutX": 550,
+        "layoutY": 200,
+        "configuration": {
+          "jsScript": "var msg = JSON.parse(JSON.stringify(msg));\nvar propagated = {};\n\n// Métricas comunes a todos los tipos de levantamiento\nvar commonKeys = ['tubing_pressure_psi', 'casing_pressure_psi', 'wellhead_temperature_f', 'flow_rate_bpd', 'motor_power_kw'];\n\n// Métricas ESP\nvar espKeys = ['frequency_hz', 'motor_current_a', 'motor_voltage_v', 'motor_temperature_f', 'intake_pressure_psi', 'discharge_pressure_psi', 'vibration_ips'];\n\n// Métricas SRP\nvar srpKeys = ['spm', 'load_lb', 'pump_fillage_pct', 'motor_current_a'];\n\n// Métricas Gas Lift\nvar glKeys = ['injection_rate_mscfd', 'injection_pressure_psi'];\n\n// Métricas PCP\nvar pcpKeys = ['speed_rpm', 'motor_torque_ftlb', 'motor_current_a', 'motor_temperature_f'];\n\nvar allKeys = commonKeys.concat(espKeys).concat(srpKeys).concat(glKeys).concat(pcpKeys);\n\nfor (var i = 0; i < allKeys.length; i++) {\n    if (msg[allKeys[i]] !== undefined && msg[allKeys[i]] !== null) {\n        propagated[allKeys[i]] = msg[allKeys[i]];\n    }\n}\n\n// Agregar timestamp de última actualización\npropagated.last_telemetry_ts = new Date().getTime();\n\nreturn {msg: propagated, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "id": "node_3",
+        "clazz": "org.thingsboard.rule.engine.transform.TbChangeOriginatorNode",
+        "name": "Cambiar a Pozo Padre",
+        "debugMode": false,
+        "singletonMode": false,
+        "queueName": null,
+        "layoutX": 800,
+        "layoutY": 200,
+        "configuration": {
+          "originatorSource": "RELATED",
+          "relationsQuery": {
+            "direction": "FROM",
+            "maxLevel": 1,
+            "filters": [
+              {
+                "relationType": "Contains",
+                "entityTypes": ["ASSET"]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "node_4",
+        "clazz": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "Guardar en Pozo",
+        "debugMode": false,
+        "singletonMode": false,
+        "queueName": null,
+        "layoutX": 1050,
+        "layoutY": 200,
+        "configuration": {
+          "defaultTTL": 0,
+          "skipLatestPersistence": false,
+          "useServerTs": false
+        }
+      },
+      {
+        "id": "node_5",
+        "clazz": "org.thingsboard.rule.engine.action.TbLogNode",
+        "name": "Log Propagación",
+        "debugMode": false,
+        "singletonMode": false,
+        "queueName": null,
+        "layoutX": 1300,
+        "layoutY": 200,
+        "configuration": {
+          "jsScript": "return 'Telemetría propagada al pozo: ' + metadata.originatorName + ' | Keys: ' + Object.keys(msg).join(', ');"
+        }
+      },
+      {
+        "id": "node_6",
+        "clazz": "org.thingsboard.rule.engine.transform.TbChangeOriginatorNode",
+        "name": "Cambiar a Macolla",
+        "debugMode": false,
+        "singletonMode": false,
+        "queueName": null,
+        "layoutX": 1050,
+        "layoutY": 350,
+        "configuration": {
+          "originatorSource": "RELATED",
+          "relationsQuery": {
+            "direction": "FROM",
+            "maxLevel": 1,
+            "filters": [
+              {
+                "relationType": "Contains",
+                "entityTypes": ["ASSET"]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "node_7",
+        "clazz": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Métricas para Macolla",
+        "debugMode": false,
+        "singletonMode": false,
+        "queueName": null,
+        "layoutX": 1300,
+        "layoutY": 350,
+        "configuration": {
+          "jsScript": "var aggregated = {};\nif (msg.flow_rate_bpd !== undefined) aggregated.well_production_bpd = msg.flow_rate_bpd;\nif (msg.tubing_pressure_psi !== undefined) aggregated.well_tubing_pressure_psi = msg.tubing_pressure_psi;\naggregated.well_last_update_ts = new Date().getTime();\nreturn {msg: aggregated, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "id": "node_8",
+        "clazz": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "Guardar en Macolla",
+        "debugMode": false,
+        "singletonMode": false,
+        "queueName": null,
+        "layoutX": 1550,
+        "layoutY": 350,
+        "configuration": {
+          "defaultTTL": 0,
+          "skipLatestPersistence": false,
+          "useServerTs": false
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 3,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 4,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 6,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 6,
+        "toIndex": 7,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 7,
+        "toIndex": 8,
+        "type": "Success"
+      }
+    ],
+    "ruleChainConnections": []
+  }
+}

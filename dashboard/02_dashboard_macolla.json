@@ -1,0 +1,381 @@
+{
+  "dashboard": {
+    "id": {
+      "id": "02_dashboard_macolla"
+    },
+    "tenantId": {
+      "id": "SYSTEM"
+    },
+    "customerId": null,
+    "name": "Atilax - Macolla",
+    "title": "Atilax - Macolla",
+    "description": "Dashboard for drilling unit/well cluster monitoring",
+    "image": null,
+    "assigned": true,
+    "mobile": false,
+    "mobileHeight": 0,
+    "mobileHideToolbar": false,
+    "isAutoCommit": true,
+    "gridSettings": {
+      "columns": 24,
+      "margins": [10, 10],
+      "outerMargin": true
+    },
+    "color": null,
+    "backgroundColor": null,
+    "backgroundImage": null,
+    "backgroundImageOpacity": null,
+    "backgroundSize": null,
+    "backgroundPosition": null,
+    "widgetsSortOrder": [],
+    "entityAliases": [
+      {
+        "id": "alias_mac_1",
+        "alias": "Macolla Seleccionada",
+        "filter": {
+          "type": "stateEntity",
+          "singleEntity": true,
+          "stateEntityParamName": "macolla",
+          "defaultStateEntity": null
+        }
+      },
+      {
+        "id": "alias_mac_2",
+        "alias": "Pozos de Macolla",
+        "filter": {
+          "type": "relationsQuery",
+          "rootStateEntity": true,
+          "stateEntityParamName": "macolla",
+          "direction": "FROM",
+          "maxLevel": 1,
+          "filters": [
+            {
+              "relationType": "Contains",
+              "entityTypes": ["ASSET"]
+            }
+          ]
+        }
+      }
+    ],
+    "dashboardFilters": [
+      {
+        "id": "macolla_filter",
+        "key": "macolla",
+        "title": "Macolla",
+        "type": "entityFilter",
+        "entityType": "ASSET",
+        "singleEntity": true
+      }
+    ],
+    "widgets": [
+      {
+        "id": "widget_wells_table",
+        "type": "latest-table",
+        "sizeX": 24,
+        "sizeY": 8,
+        "config": {
+          "title": "Pozos de la Macolla",
+          "showTitle": true,
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "16px",
+          "margin": "16px",
+          "fontSize": 12,
+          "entityAliasId": "alias_mac_2",
+          "defaultSortOrder": "-flow_rate_bpd",
+          "pageSize": 20,
+          "enableSearch": true,
+          "enableSelectColumnDisplay": true,
+          "enableStickyHeader": true,
+          "rowStyleFunction": "if(row['well_status'] === 'shutdown') { return {color: 'white', backgroundColor: '#D32F2F'}; }",
+          "columns": [
+            {
+              "key": "entityName",
+              "title": "Pozo",
+              "type": "string"
+            },
+            {
+              "key": "flow_rate_bpd",
+              "title": "Producción BPD",
+              "type": "number"
+            },
+            {
+              "key": "frequency_hz",
+              "title": "Frecuencia Hz",
+              "type": "number"
+            },
+            {
+              "key": "motor_current_a",
+              "title": "Corriente A",
+              "type": "number"
+            },
+            {
+              "key": "motor_temperature_f",
+              "title": "Temp °F",
+              "type": "number"
+            },
+            {
+              "key": "tubing_pressure_psi",
+              "title": "Presión psi",
+              "type": "number"
+            },
+            {
+              "key": "pump_efficiency_pct",
+              "title": "Eficiencia %",
+              "type": "number"
+            },
+            {
+              "key": "well_status",
+              "title": "Estado",
+              "type": "string"
+            }
+          ]
+        },
+        "row": 0,
+        "col": 0
+      },
+      {
+        "id": "widget_total_production",
+        "type": "cards",
+        "sizeX": 8,
+        "sizeY": 4,
+        "config": {
+          "title": "Producción Total Macolla",
+          "showTitle": true,
+          "backgroundColor": "#ffffff",
+          "color": "#000000",
+          "padding": "16px",
+          "margin": "16px",
+          "fontSize": 14,
+          "entityAliasId": "alias_mac_2",
+          "valuesFontSize": 32,
+          "datasources": [
+            {
+              "dataSourceName": "macolla_wells",
+              "dataKeys": [
+                {
+                  "name": "flow_rate_bpd",
+                  "label": "BPD",
+                  "type": "timeseries",
+                  "color": "#1E3A5F",
+                  "aggregationType": "SUM"
+                }
+              ]
+            }
+          ],
+          "unitsPosition": "right",
+          "units": "BPD",
+          "unitsFontSize": 16
+        },
+        "row": 8,
+        "col": 0
+      },
+      {
+        "id": "widget_active_wells",
+        "type": "cards",
+        "sizeX": 8,
+        "sizeY": 4,
+        "config": {
+          "title": "Pozos Activos",
+          "showTitle": true,
+          "backgroundColor": "#ffffff",
+          "color": "#000000",
+          "padding": "16px",
+          "margin": "16px",
+          "fontSize": 14,
+          "entityAliasId": "alias_mac_2",
+          "valuesFontSize": 32,
+          "datasources": [
+            {
+              "dataSourceName": "macolla_wells",
+              "dataKeys": [
+                {
+                  "name": "well_status",
+                  "label": "Activos",
+                  "type": "timeseries",
+                  "color": "#27AE60",
+                  "aggregationType": "COUNT",
+                  "filterFunction": "value === 'active'"
+                }
+              ]
+            }
+          ],
+          "icon": "mdi:oil"
+        },
+        "row": 8,
+        "col": 8
+      },
+      {
+        "id": "widget_avg_efficiency",
+        "type": "cards",
+        "sizeX": 8,
+        "sizeY": 4,
+        "config": {
+          "title": "Eficiencia Promedio",
+          "showTitle": true,
+          "backgroundColor": "#ffffff",
+          "color": "#000000",
+          "padding": "16px",
+          "margin": "16px",
+          "fontSize": 14,
+          "entityAliasId": "alias_mac_2",
+          "valuesFontSize": 32,
+          "datasources": [
+            {
+              "dataSourceName": "macolla_wells",
+              "dataKeys": [
+                {
+                  "name": "pump_efficiency_pct",
+                  "label": "%",
+                  "type": "timeseries",
+                  "aggregationType": "AVG",
+                  "color": "#27AE60"
+                }
+              ]
+            }
+          ],
+          "unitsPosition": "right",
+          "units": "%",
+          "unitsFontSize": 16,
+          "colorFunction": "if(value > 70) { return '#27AE60'; } else if(value >= 50) { return '#FFA726'; } else { return '#D32F2F'; }"
+        },
+        "row": 8,
+        "col": 16
+      },
+      {
+        "id": "widget_efficiency_comparison",
+        "type": "timeseries",
+        "sizeX": 12,
+        "sizeY": 8,
+        "config": {
+          "title": "Comparación de Eficiencia entre Pozos",
+          "showTitle": true,
+          "backgroundColor": "#ffffff",
+          "color": "#000000",
+          "padding": "16px",
+          "margin": "16px",
+          "fontSize": 14,
+          "entityAliasId": "alias_mac_2",
+          "datasources": [
+            {
+              "dataSourceName": "macolla_wells",
+              "dataKeys": [
+                {
+                  "name": "pump_efficiency_pct",
+                  "label": "Eficiencia %",
+                  "type": "timeseries",
+                  "color": "#2196F3"
+                }
+              ]
+            }
+          ],
+          "showLegend": true,
+          "legendPosition": "bottom",
+          "yAxisLabel": "Eficiencia %",
+          "xAxisLabel": "Pozo",
+          "chartType": "bar",
+          "showPointsInTime": false
+        },
+        "row": 12,
+        "col": 0
+      },
+      {
+        "id": "widget_optimization_opportunities",
+        "type": "latest-table",
+        "sizeX": 12,
+        "sizeY": 8,
+        "config": {
+          "title": "Oportunidades de Optimización",
+          "showTitle": true,
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "16px",
+          "margin": "16px",
+          "fontSize": 12,
+          "entityAliasId": "alias_mac_2",
+          "defaultSortOrder": "-opt_production_gain_pct",
+          "pageSize": 20,
+          "enableSearch": true,
+          "enableSelectColumnDisplay": true,
+          "filterFunction": "row['opt_production_gain_pct'] > 0",
+          "columns": [
+            {
+              "key": "entityName",
+              "title": "Pozo",
+              "type": "string"
+            },
+            {
+              "key": "opt_production_gain_pct",
+              "title": "Ganancia %",
+              "type": "number"
+            },
+            {
+              "key": "opt_recommended_action",
+              "title": "Acción",
+              "type": "string"
+            },
+            {
+              "key": "opt_confidence_pct",
+              "title": "Confianza %",
+              "type": "number"
+            },
+            {
+              "key": "opt_expected_production_bpd",
+              "title": "Prod. Esperada BPD",
+              "type": "number"
+            }
+          ]
+        },
+        "row": 12,
+        "col": 12
+      },
+      {
+        "id": "widget_production_trend",
+        "type": "timeseries",
+        "sizeX": 24,
+        "sizeY": 6,
+        "config": {
+          "title": "Tendencia de Producción - Macolla",
+          "showTitle": true,
+          "backgroundColor": "#ffffff",
+          "color": "#000000",
+          "padding": "16px",
+          "margin": "16px",
+          "fontSize": 14,
+          "entityAliasId": "alias_mac_2",
+          "datasources": [
+            {
+              "dataSourceName": "macolla_wells",
+              "dataKeys": [
+                {
+                  "name": "flow_rate_bpd",
+                  "label": "Producción BPD",
+                  "type": "timeseries",
+                  "color": "#2196F3",
+                  "showLines": true,
+                  "showPoints": false
+                }
+              ]
+            }
+          ],
+          "showLegend": true,
+          "legendPosition": "bottom",
+          "yAxisLabel": "Producción (BPD)",
+          "xAxisLabel": "Tiempo",
+          "timewindow": {
+            "realtime": {
+              "interval": 1000,
+              "timewindowMs": 604800000
+            }
+          },
+          "showPointsInTime": false,
+          "showCrosshair": true
+        },
+        "row": 20,
+        "col": 0
+      }
+    ]
+  },
+  "exportedAt": "2025-02-08T00:00:00.000Z",
+  "externalExportInformation": null
+}

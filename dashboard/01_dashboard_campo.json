@@ -1,0 +1,541 @@
+{
+  "title": "Atilax - Campo (Vista Ejecutiva)",
+  "image": null,
+  "mobileHide": false,
+  "mobileOrder": null,
+  "configuration": {
+    "description": "Vista ejecutiva del campo petrolero con KPIs agregados, mapa de pozos y tendencias de producción",
+    "widgets": {
+      "widget_campo_1": {
+        "type": "openstreetMap",
+        "bundleAlias": "maps",
+        "typeAlias": "openstreetMap",
+        "sizeX": 12,
+        "sizeY": 8,
+        "row": 0,
+        "col": 0,
+        "config": {
+          "title": "Mapa de Pozos",
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_campo_1",
+              "dataKeys": [
+                {
+                  "name": "latitude",
+                  "type": "attribute"
+                },
+                {
+                  "name": "longitude",
+                  "type": "attribute"
+                },
+                {
+                  "name": "well_status",
+                  "type": "attribute"
+                }
+              ]
+            }
+          ],
+          "settings": {
+            "showLabel": true,
+            "label": "${entityName}",
+            "useLabelFunction": false,
+            "provider": "openstreet-map",
+            "defaultZoomLevel": 12,
+            "fitMapBounds": true,
+            "mapProvider": "OpenStreetMap.Mapnik",
+            "colorFunction": "if(value === 'active') { return '#27AE60'; } else if(value === 'testing' || value === 'workover') { return '#F5A623'; } else if(value === 'shutdown') { return '#E74C3C'; } else { return '#95A5A6'; }",
+            "markerColor": "#27AE60",
+            "useDefaultMarkerColor": false,
+            "showClustering": true,
+            "clustering": {
+              "zoomOnClick": true,
+              "maxClusterRadius": 80
+            }
+          }
+        }
+      },
+      "widget_campo_2": {
+        "type": "value_card",
+        "bundleAlias": "cards",
+        "typeAlias": "value_card_widget2",
+        "sizeX": 6,
+        "sizeY": 4,
+        "row": 0,
+        "col": 12,
+        "config": {
+          "title": "Producción Total del Campo",
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_campo_1",
+              "dataKeys": [
+                {
+                  "name": "flow_rate_bpd",
+                  "type": "timeseries",
+                  "aggregationType": "SUM",
+                  "label": "Producción Total",
+                  "decimals": 0,
+                  "units": "BPD",
+                  "color": "#1E3A5F",
+                  "unit": "BPD"
+                }
+              ]
+            }
+          ],
+          "settings": {
+            "backgroundColor": "#FFFFFF",
+            "cardHeight": "100px",
+            "cardHeightUnit": "px",
+            "valueFont": {
+              "size": 32,
+              "bold": true,
+              "italic": false
+            },
+            "labelFont": {
+              "size": 14,
+              "bold": false,
+              "italic": false
+            },
+            "valueColor": "#1E3A5F",
+            "labelColor": "#5F5F5F",
+            "showLabel": true,
+            "label": "Producción Total",
+            "showTimestamp": true,
+            "autoScale": true,
+            "decimals": 0
+          }
+        }
+      },
+      "widget_campo_3": {
+        "type": "doughnut",
+        "bundleAlias": "charts",
+        "typeAlias": "doughnut",
+        "sizeX": 6,
+        "sizeY": 4,
+        "row": 0,
+        "col": 18,
+        "config": {
+          "title": "Pozos por Estado",
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_campo_1",
+              "dataKeys": [
+                {
+                  "name": "well_status",
+                  "type": "attribute",
+                  "label": "Estado del Pozo"
+                }
+              ]
+            }
+          ],
+          "settings": {
+            "showTitle": true,
+            "showLegend": true,
+            "legendPosition": "bottom",
+            "showTooltip": true,
+            "showLabel": true,
+            "animation": true,
+            "animationDuration": 800,
+            "animationDelay": 0,
+            "colors": [
+              "#27AE60",
+              "#F5A623",
+              "#3498DB",
+              "#E74C3C",
+              "#95A5A6"
+            ],
+            "valueFormat": "{value}",
+            "labelFormat": "{label}",
+            "tooltip": "{label}: {value}",
+            "series": [
+              {
+                "name": "active",
+                "color": "#27AE60"
+              },
+              {
+                "name": "testing",
+                "color": "#F5A623"
+              },
+              {
+                "name": "workover",
+                "color": "#3498DB"
+              },
+              {
+                "name": "shutdown",
+                "color": "#E74C3C"
+              },
+              {
+                "name": "inactive",
+                "color": "#95A5A6"
+              }
+            ]
+          }
+        }
+      },
+      "widget_campo_4": {
+        "type": "alarmTable",
+        "bundleAlias": "entity_admin_widgets",
+        "typeAlias": "entities_table_widget",
+        "sizeX": 12,
+        "sizeY": 8,
+        "row": 8,
+        "col": 0,
+        "config": {
+          "title": "Ranking de Pozos por Producción",
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_campo_1",
+              "dataKeys": [
+                {
+                  "name": "flow_rate_bpd",
+                  "type": "timeseries",
+                  "label": "Producción BPD",
+                  "decimals": 2,
+                  "units": "BPD"
+                },
+                {
+                  "name": "frequency_hz",
+                  "type": "timeseries",
+                  "label": "Frecuencia Hz",
+                  "decimals": 2,
+                  "units": "Hz"
+                },
+                {
+                  "name": "motor_temperature_f",
+                  "type": "timeseries",
+                  "label": "Temp Motor °F",
+                  "decimals": 1,
+                  "units": "°F"
+                },
+                {
+                  "name": "tubing_pressure_psi",
+                  "type": "timeseries",
+                  "label": "Presión Tubing psi",
+                  "decimals": 1,
+                  "units": "psi"
+                },
+                {
+                  "name": "well_status",
+                  "type": "attribute",
+                  "label": "Estado"
+                }
+              ]
+            }
+          ],
+          "settings": {
+            "defaultSortOrder": "flow_rate_bpd",
+            "defaultSortOrderDirection": "DESC",
+            "pageSize": 15,
+            "enableSearch": true,
+            "enableFilter": true,
+            "enableSelection": false,
+            "enableExport": true,
+            "displayPagination": true,
+            "striped": true,
+            "hoverable": true,
+            "bordered": true,
+            "condensed": false,
+            "columns": [
+              {
+                "name": "entityName",
+                "label": "Pozo",
+                "type": "string",
+                "width": "15%"
+              },
+              {
+                "name": "flow_rate_bpd",
+                "label": "Producción BPD",
+                "type": "decimal",
+                "width": "15%"
+              },
+              {
+                "name": "frequency_hz",
+                "label": "Frecuencia Hz",
+                "type": "decimal",
+                "width": "15%"
+              },
+              {
+                "name": "motor_temperature_f",
+                "label": "Temp Motor °F",
+                "type": "decimal",
+                "width": "15%"
+              },
+              {
+                "name": "tubing_pressure_psi",
+                "label": "Presión Tubing psi",
+                "type": "decimal",
+                "width": "15%"
+              },
+              {
+                "name": "well_status",
+                "label": "Estado",
+                "type": "string",
+                "width": "15%"
+              }
+            ]
+          }
+        }
+      },
+      "widget_campo_5": {
+        "type": "timeseries",
+        "bundleAlias": "charts",
+        "typeAlias": "basic_timeseries",
+        "sizeX": 12,
+        "sizeY": 8,
+        "row": 8,
+        "col": 12,
+        "config": {
+          "title": "Tendencia de Producción del Campo",
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_campo_1",
+              "dataKeys": [
+                {
+                  "name": "flow_rate_bpd",
+                  "type": "timeseries",
+                  "aggregationType": "SUM",
+                  "label": "Producción Total",
+                  "color": "#1E3A5F",
+                  "units": "BPD",
+                  "decimals": 0
+                }
+              ],
+              "aggregationType": "SUM",
+              "timewindow": {
+                "displayValue": "7 Días",
+                "selectedTab": 1,
+                "realtime": {
+                  "realtimeType": 0,
+                  "timewindowMs": 604800000,
+                  "quickInterval": "LAST_7_DAYS"
+                }
+              }
+            }
+          ],
+          "settings": {
+            "showTitle": true,
+            "showLegend": true,
+            "legendPosition": "bottom",
+            "showTooltip": true,
+            "showPoints": false,
+            "lineWidth": 2,
+            "fillArea": true,
+            "fillAreaOpacity": 0.2,
+            "animation": true,
+            "animationDuration": 500,
+            "animationDelay": 0,
+            "showCrosshair": true,
+            "crosshairType": "vertical",
+            "yAxisLabel": "BPD",
+            "tooltipFormat": "{value} BPD",
+            "dataZoom": {
+              "enabled": true,
+              "position": "bottom"
+            },
+            "aggregationInterval": {
+              "value": 1,
+              "unit": "hours"
+            }
+          }
+        }
+      },
+      "widget_campo_6": {
+        "type": "alarms_table",
+        "bundleAlias": "alarm_widgets",
+        "typeAlias": "alarms_table_widget",
+        "sizeX": 24,
+        "sizeY": 6,
+        "row": 16,
+        "col": 0,
+        "config": {
+          "title": "Alarmas Activas del Campo",
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_campo_1"
+            }
+          ],
+          "settings": {
+            "enableFilter": true,
+            "enableSearch": true,
+            "displayPagination": true,
+            "defaultPageSize": 10,
+            "pageSize": 10,
+            "striped": true,
+            "hoverable": true,
+            "bordered": true,
+            "condensed": false,
+            "showSearchIcon": true,
+            "showClearButton": true,
+            "displaySearchIcon": true,
+            "columns": [
+              {
+                "name": "createdTime",
+                "label": "Fecha",
+                "type": "date",
+                "width": "15%",
+                "format": "dd/MM/yyyy HH:mm:ss"
+              },
+              {
+                "name": "originator",
+                "label": "Origen",
+                "type": "string",
+                "width": "20%"
+              },
+              {
+                "name": "type",
+                "label": "Tipo",
+                "type": "string",
+                "width": "15%"
+              },
+              {
+                "name": "severity",
+                "label": "Severidad",
+                "type": "string",
+                "width": "10%",
+                "cellStyleFunction": "if(value === 'CRITICAL') { return {color: '#E74C3C', fontWeight: 'bold'}; } else if(value === 'MAJOR') { return {color: '#F5A623', fontWeight: 'bold'}; } else if(value === 'MINOR') { return {color: '#F39C12'}; } else { return {color: '#3498DB'}; }"
+              },
+              {
+                "name": "status",
+                "label": "Estado",
+                "type": "string",
+                "width": "15%"
+              },
+              {
+                "name": "details",
+                "label": "Detalles",
+                "type": "string",
+                "width": "25%"
+              }
+            ],
+            "alarmSearchStatus": [
+              "ACTIVE_UNACK",
+              "ACTIVE_ACK"
+            ],
+            "showAckButton": true,
+            "showClearButton": true,
+            "showDetailsButton": true
+          }
+        }
+      }
+    },
+    "states": {
+      "default": {
+        "name": "Campo",
+        "root": true,
+        "layouts": {
+          "main": {
+            "widgets": {
+              "widget_campo_1": {
+                "sizeX": 12,
+                "sizeY": 8,
+                "row": 0,
+                "col": 0
+              },
+              "widget_campo_2": {
+                "sizeX": 6,
+                "sizeY": 4,
+                "row": 0,
+                "col": 12
+              },
+              "widget_campo_3": {
+                "sizeX": 6,
+                "sizeY": 4,
+                "row": 0,
+                "col": 18
+              },
+              "widget_campo_4": {
+                "sizeX": 12,
+                "sizeY": 8,
+                "row": 8,
+                "col": 0
+              },
+              "widget_campo_5": {
+                "sizeX": 12,
+                "sizeY": 8,
+                "row": 8,
+                "col": 12
+              },
+              "widget_campo_6": {
+                "sizeX": 24,
+                "sizeY": 6,
+                "row": 16,
+                "col": 0
+              }
+            },
+            "gridSettings": {
+              "backgroundColor": "#FAFAFA",
+              "columns": 24,
+              "margin": 10,
+              "outerMargin": true,
+              "backgroundSizeMode": "100%"
+            }
+          }
+        }
+      }
+    },
+    "entityAliases": {
+      "alias_campo_1": {
+        "id": "alias_campo_1",
+        "alias": "Todos los Pozos",
+        "filter": {
+          "type": "assetType",
+          "resolveMultiple": true,
+          "assetType": "well",
+          "assetNameFilter": ""
+        }
+      },
+      "alias_campo_2": {
+        "id": "alias_campo_2",
+        "alias": "Todas las Macollas",
+        "filter": {
+          "type": "assetType",
+          "resolveMultiple": true,
+          "assetType": "macolla",
+          "assetNameFilter": ""
+        }
+      },
+      "alias_campo_3": {
+        "id": "alias_campo_3",
+        "alias": "Campo",
+        "filter": {
+          "type": "assetType",
+          "resolveMultiple": false,
+          "assetType": "field",
+          "assetNameFilter": ""
+        }
+      }
+    },
+    "filters": {},
+    "timewindow": {
+      "displayValue": "",
+      "selectedTab": 0,
+      "realtime": {
+        "realtimeType": 0,
+        "timewindowMs": 86400000,
+        "quickInterval": "CURRENT_DAY"
+      }
+    },
+    "settings": {
+      "stateControllerId": "entity",
+      "showTitle": true,
+      "showDashboardsSelect": true,
+      "showEntitiesSelect": true,
+      "showDashboardTimewindow": true,
+      "showDashboardExport": true,
+      "toolbarAlwaysOpen": true,
+      "backgroundColor": "#FAFAFA",
+      "gridSettings": {
+        "backgroundColor": "#FAFAFA",
+        "columns": 24,
+        "margin": 10,
+        "outerMargin": true,
+        "backgroundSizeMode": "100%"
+      }
+    }
+  }
+}

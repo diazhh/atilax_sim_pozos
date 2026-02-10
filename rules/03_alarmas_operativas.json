@@ -1,0 +1,225 @@
+{
+  "ruleChain": {
+    "name": "Atilax - Alarmas Operativas",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 0,
+    "nodes": [
+      {
+        "id": "node_0",
+        "type": "org.thingsboard.rule.engine.flow.TbRuleChainInputNode",
+        "name": "Input",
+        "debugMode": false,
+        "configuration": {},
+        "layoutX": 100,
+        "layoutY": 300
+      },
+      {
+        "id": "node_1",
+        "type": "org.thingsboard.rule.engine.metadata.TbGetAttributesNode",
+        "name": "Obtener Umbrales",
+        "debugMode": false,
+        "configuration": {
+          "clientAttributeNames": [],
+          "sharedAttributeNames": [
+            "alarm_high_temperature_f",
+            "alarm_low_intake_pressure_psi",
+            "alarm_high_vibration_ips",
+            "alarm_low_efficiency_pct",
+            "alarm_high_current_a",
+            "alarm_low_frequency_hz",
+            "alarm_high_injection_rate_mscfd",
+            "alarm_comm_timeout_min"
+          ],
+          "serverAttributeNames": ["lifting_type", "well_status"],
+          "latestTsKeyNames": [],
+          "tellFailureIfAbsent": false,
+          "getLatestValueWithTs": false,
+          "fetchTo": "METADATA"
+        },
+        "layoutX": 300,
+        "layoutY": 300
+      },
+      {
+        "id": "node_2",
+        "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+        "name": "¿Pozo Activo?",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "return metadata.ss_well_status === 'active' || metadata.ss_well_status === 'testing';"
+        },
+        "layoutX": 550,
+        "layoutY": 300
+      },
+      {
+        "id": "node_3",
+        "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+        "name": "Alarma Alta Temperatura",
+        "debugMode": false,
+        "configuration": {
+          "useMessageAlarmData": false,
+          "alarmType": "HIGH_TEMPERATURE",
+          "severity": "MAJOR",
+          "propagate": true,
+          "propagateToOwner": true,
+          "propagateToTenant": false,
+          "relationTypes": [],
+          "alarmDetailsBuildJs": "var details = {};\ndetails.value = msg.motor_temperature_f;\ndetails.threshold = metadata.ss_alarm_high_temperature_f || 250;\ndetails.device = metadata.deviceName;\ndetails.description = 'Temperatura del motor excede umbral: ' + msg.motor_temperature_f + ' °F (límite: ' + (metadata.ss_alarm_high_temperature_f || 250) + ' °F)';\nreturn details;",
+          "createConditionJs": "var threshold = Number(metadata.ss_alarm_high_temperature_f) || 250;\nreturn msg.motor_temperature_f !== undefined && msg.motor_temperature_f > threshold;",
+          "clearConditionJs": "var threshold = Number(metadata.ss_alarm_high_temperature_f) || 250;\nreturn msg.motor_temperature_f !== undefined && msg.motor_temperature_f <= (threshold * 0.95);"
+        },
+        "layoutX": 800,
+        "layoutY": 100
+      },
+      {
+        "id": "node_4",
+        "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+        "name": "Alarma Baja Presión Intake",
+        "debugMode": false,
+        "configuration": {
+          "useMessageAlarmData": false,
+          "alarmType": "LOW_INTAKE_PRESSURE",
+          "severity": "MAJOR",
+          "propagate": true,
+          "propagateToOwner": true,
+          "propagateToTenant": false,
+          "alarmDetailsBuildJs": "var details = {};\ndetails.value = msg.intake_pressure_psi;\ndetails.threshold = metadata.ss_alarm_low_intake_pressure_psi || 100;\ndetails.device = metadata.deviceName;\ndetails.description = 'Presión de intake por debajo del umbral: ' + msg.intake_pressure_psi + ' psi (mínimo: ' + (metadata.ss_alarm_low_intake_pressure_psi || 100) + ' psi)';\nreturn details;",
+          "createConditionJs": "var threshold = Number(metadata.ss_alarm_low_intake_pressure_psi) || 100;\nreturn msg.intake_pressure_psi !== undefined && msg.intake_pressure_psi < threshold;",
+          "clearConditionJs": "var threshold = Number(metadata.ss_alarm_low_intake_pressure_psi) || 100;\nreturn msg.intake_pressure_psi !== undefined && msg.intake_pressure_psi >= (threshold * 1.05);"
+        },
+        "layoutX": 800,
+        "layoutY": 200
+      },
+      {
+        "id": "node_5",
+        "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+        "name": "Alarma Alta Vibración",
+        "debugMode": false,
+        "configuration": {
+          "useMessageAlarmData": false,
+          "alarmType": "HIGH_VIBRATION",
+          "severity": "CRITICAL",
+          "propagate": true,
+          "propagateToOwner": true,
+          "propagateToTenant": true,
+          "alarmDetailsBuildJs": "var details = {};\ndetails.value = msg.vibration_ips;\ndetails.threshold = metadata.ss_alarm_high_vibration_ips || 5;\ndetails.device = metadata.deviceName;\ndetails.description = 'Vibración excesiva detectada: ' + msg.vibration_ips + ' ips (límite: ' + (metadata.ss_alarm_high_vibration_ips || 5) + ' ips). Requiere inspección inmediata.';\nreturn details;",
+          "createConditionJs": "var threshold = Number(metadata.ss_alarm_high_vibration_ips) || 5;\nreturn msg.vibration_ips !== undefined && msg.vibration_ips > threshold;",
+          "clearConditionJs": "var threshold = Number(metadata.ss_alarm_high_vibration_ips) || 5;\nreturn msg.vibration_ips !== undefined && msg.vibration_ips <= (threshold * 0.8);"
+        },
+        "layoutX": 800,
+        "layoutY": 300
+      },
+      {
+        "id": "node_6",
+        "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+        "name": "Alarma Bomba Apagada",
+        "debugMode": false,
+        "configuration": {
+          "useMessageAlarmData": false,
+          "alarmType": "PUMP_OFF_DETECTED",
+          "severity": "CRITICAL",
+          "propagate": true,
+          "propagateToOwner": true,
+          "propagateToTenant": true,
+          "alarmDetailsBuildJs": "var details = {};\ndetails.frequency = msg.frequency_hz;\ndetails.current = msg.motor_current_a;\ndetails.device = metadata.deviceName;\ndetails.description = 'Bomba posiblemente apagada - Frecuencia: ' + msg.frequency_hz + ' Hz, Corriente: ' + msg.motor_current_a + ' A';\nreturn details;",
+          "createConditionJs": "return (msg.frequency_hz !== undefined && msg.frequency_hz === 0) || (msg.motor_current_a !== undefined && msg.motor_current_a < 0.5);",
+          "clearConditionJs": "return msg.frequency_hz !== undefined && msg.frequency_hz > 5 && msg.motor_current_a > 1;"
+        },
+        "layoutX": 800,
+        "layoutY": 400
+      },
+      {
+        "id": "node_7",
+        "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+        "name": "Alarma Baja Eficiencia",
+        "debugMode": false,
+        "configuration": {
+          "useMessageAlarmData": false,
+          "alarmType": "LOW_EFFICIENCY",
+          "severity": "MINOR",
+          "propagate": true,
+          "propagateToOwner": true,
+          "propagateToTenant": false,
+          "alarmDetailsBuildJs": "var details = {};\ndetails.value = msg.pump_efficiency_pct;\ndetails.threshold = metadata.ss_alarm_low_efficiency_pct || 50;\ndetails.device = metadata.deviceName;\ndetails.description = 'Eficiencia del sistema por debajo del umbral: ' + msg.pump_efficiency_pct + '% (mínimo: ' + (metadata.ss_alarm_low_efficiency_pct || 50) + '%)';\nreturn details;",
+          "createConditionJs": "var threshold = Number(metadata.ss_alarm_low_efficiency_pct) || 50;\nreturn msg.pump_efficiency_pct !== undefined && msg.pump_efficiency_pct < threshold;",
+          "clearConditionJs": "var threshold = Number(metadata.ss_alarm_low_efficiency_pct) || 50;\nreturn msg.pump_efficiency_pct !== undefined && msg.pump_efficiency_pct >= (threshold * 1.1);"
+        },
+        "layoutX": 800,
+        "layoutY": 500
+      },
+      {
+        "id": "node_8",
+        "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+        "name": "Alarma Alta Corriente",
+        "debugMode": false,
+        "configuration": {
+          "useMessageAlarmData": false,
+          "alarmType": "HIGH_MOTOR_CURRENT",
+          "severity": "MAJOR",
+          "propagate": true,
+          "propagateToOwner": true,
+          "propagateToTenant": false,
+          "alarmDetailsBuildJs": "var details = {};\ndetails.value = msg.motor_current_a;\ndetails.threshold = metadata.ss_alarm_high_current_a || 200;\ndetails.device = metadata.deviceName;\ndetails.description = 'Corriente del motor excede umbral: ' + msg.motor_current_a + ' A (límite: ' + (metadata.ss_alarm_high_current_a || 200) + ' A)';\nreturn details;",
+          "createConditionJs": "var threshold = Number(metadata.ss_alarm_high_current_a) || 200;\nreturn msg.motor_current_a !== undefined && msg.motor_current_a > threshold;",
+          "clearConditionJs": "var threshold = Number(metadata.ss_alarm_high_current_a) || 200;\nreturn msg.motor_current_a !== undefined && msg.motor_current_a <= (threshold * 0.9);"
+        },
+        "layoutX": 1100,
+        "layoutY": 150
+      },
+      {
+        "id": "node_9",
+        "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+        "name": "Alarma Pérdida Comunicación",
+        "debugMode": false,
+        "configuration": {
+          "useMessageAlarmData": false,
+          "alarmType": "COMMUNICATION_LOSS",
+          "severity": "MAJOR",
+          "propagate": true,
+          "propagateToOwner": true,
+          "propagateToTenant": false,
+          "alarmDetailsBuildJs": "var details = {};\ndetails.device = metadata.deviceName;\ndetails.lastActivityTime = metadata.lastActivityTime;\ndetails.description = 'Pérdida de comunicación con dispositivo: ' + metadata.deviceName + '. Última actividad: ' + new Date(Number(metadata.lastActivityTime)).toISOString();\nreturn details;",
+          "createConditionJs": "return msgType === 'INACTIVITY_EVENT';",
+          "clearConditionJs": "return msgType === 'ACTIVITY_EVENT';"
+        },
+        "layoutX": 1100,
+        "layoutY": 300
+      },
+      {
+        "id": "node_10",
+        "type": "org.thingsboard.rule.engine.action.TbLogNode",
+        "name": "Log Alarma",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "return 'Alarma procesada para ' + metadata.deviceName + ': ' + msgType + ' | ' + JSON.stringify(msg).substring(0, 200);"
+        },
+        "layoutX": 1100,
+        "layoutY": 500
+      }
+    ],
+    "connections": [
+      { "fromIndex": 0, "toIndex": 1, "type": "Success" },
+      { "fromIndex": 1, "toIndex": 2, "type": "Success" },
+      { "fromIndex": 2, "toIndex": 3, "type": "True" },
+      { "fromIndex": 2, "toIndex": 4, "type": "True" },
+      { "fromIndex": 2, "toIndex": 5, "type": "True" },
+      { "fromIndex": 2, "toIndex": 6, "type": "True" },
+      { "fromIndex": 2, "toIndex": 7, "type": "True" },
+      { "fromIndex": 2, "toIndex": 8, "type": "True" },
+      { "fromIndex": 0, "toIndex": 9, "type": "Success" },
+      { "fromIndex": 3, "toIndex": 10, "type": "Created" },
+      { "fromIndex": 4, "toIndex": 10, "type": "Created" },
+      { "fromIndex": 5, "toIndex": 10, "type": "Created" },
+      { "fromIndex": 6, "toIndex": 10, "type": "Created" },
+      { "fromIndex": 7, "toIndex": 10, "type": "Created" },
+      { "fromIndex": 8, "toIndex": 10, "type": "Created" },
+      { "fromIndex": 9, "toIndex": 10, "type": "Created" }
+    ],
+    "ruleChainConnections": []
+  }
+}

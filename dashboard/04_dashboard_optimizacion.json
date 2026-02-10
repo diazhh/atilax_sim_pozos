@@ -1,0 +1,426 @@
+{
+  "title": "Atilax - Optimización de Campo",
+  "configuration": {
+    "description": "Dashboard para análisis de optimización de producción a nivel de campo",
+    "widgets": [
+      {
+        "id": "w1",
+        "key": "widget_opt_1",
+        "type": "latest",
+        "title": "Producción Actual",
+        "sizeX": 6,
+        "sizeY": 3,
+        "row": 0,
+        "col": 0,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_opt_1",
+              "key": "flow_rate_bpd",
+              "aggregationType": "SUM",
+              "dataAggregationType": "NONE"
+            }
+          ],
+          "units": "BPD",
+          "decimals": 0,
+          "fontSize": 32,
+          "fontColor": "#1E3A5F",
+          "backgroundColor": "#FFFFFF",
+          "alignment": "center"
+        }
+      },
+      {
+        "id": "w2",
+        "key": "widget_opt_2",
+        "type": "latest",
+        "title": "Producción Potencial",
+        "sizeX": 6,
+        "sizeY": 3,
+        "row": 0,
+        "col": 6,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_opt_1",
+              "key": "opt_expected_production_bpd",
+              "aggregationType": "SUM",
+              "dataAggregationType": "NONE"
+            }
+          ],
+          "units": "BPD",
+          "decimals": 0,
+          "fontSize": 32,
+          "fontColor": "#27AE60",
+          "backgroundColor": "#FFFFFF",
+          "alignment": "center"
+        }
+      },
+      {
+        "id": "w3",
+        "key": "widget_opt_3",
+        "type": "latest",
+        "title": "Brecha de Producción",
+        "sizeX": 6,
+        "sizeY": 3,
+        "row": 0,
+        "col": 12,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_opt_1",
+              "key": "opt_production_gap_bpd",
+              "aggregationType": "SUM",
+              "dataAggregationType": "NONE"
+            }
+          ],
+          "units": "BPD",
+          "decimals": 0,
+          "fontSize": 32,
+          "fontColor": "#F5A623",
+          "backgroundColor": "#FFFFFF",
+          "alignment": "center"
+        }
+      },
+      {
+        "id": "w4",
+        "key": "widget_opt_4",
+        "type": "latest",
+        "title": "Oportunidades Activas",
+        "sizeX": 6,
+        "sizeY": 3,
+        "row": 0,
+        "col": 18,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_opt_1",
+              "key": "opt_opportunities_count",
+              "aggregationType": "SUM",
+              "dataAggregationType": "NONE"
+            }
+          ],
+          "units": "",
+          "decimals": 0,
+          "fontSize": 32,
+          "fontColor": "#E74C3C",
+          "backgroundColor": "#FFFFFF",
+          "alignment": "center",
+          "thresholds": "0,5",
+          "thresholdColors": "#27AE60,#F5A623,#E74C3C"
+        }
+      },
+      {
+        "id": "w5",
+        "key": "widget_opt_5",
+        "type": "table",
+        "title": "Ranking de Oportunidades de Optimización",
+        "sizeX": 12,
+        "sizeY": 10,
+        "row": 3,
+        "col": 0,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_opt_1",
+              "dataKeys": [
+                {
+                  "name": "entityName",
+                  "label": "Pozo",
+                  "type": "entity"
+                },
+                {
+                  "name": "flow_rate_bpd",
+                  "label": "Prod. Actual BPD",
+                  "type": "timeseries"
+                },
+                {
+                  "name": "opt_expected_production_bpd",
+                  "label": "Prod. Esperada BPD",
+                  "type": "attribute"
+                },
+                {
+                  "name": "opt_production_gain_pct",
+                  "label": "Ganancia %",
+                  "type": "attribute"
+                },
+                {
+                  "name": "opt_recommended_action",
+                  "label": "Acción Recomendada",
+                  "type": "attribute"
+                },
+                {
+                  "name": "opt_confidence_pct",
+                  "label": "Confianza %",
+                  "type": "attribute"
+                },
+                {
+                  "name": "opt_status",
+                  "label": "Estado Opt.",
+                  "type": "attribute"
+                },
+                {
+                  "name": "lifting_type",
+                  "label": "Tipo Levant.",
+                  "type": "attribute"
+                }
+              ]
+            }
+          ],
+          "pageSize": 20,
+          "sortColumn": "opt_production_gain_pct",
+          "sortOrder": "DESC",
+          "rowColor": {
+            "type": "condition",
+            "conditions": [
+              {
+                "key": "opt_production_gain_pct",
+                "operator": "GREATER",
+                "value": 10,
+                "color": "#27AE60"
+              },
+              {
+                "key": "opt_production_gain_pct",
+                "operator": "BETWEEN",
+                "value1": 5,
+                "value2": 10,
+                "color": "#F5A623"
+              },
+              {
+                "key": "opt_production_gain_pct",
+                "operator": "LESS",
+                "value": 5,
+                "color": "#E8E8E8"
+              }
+            ]
+          },
+          "columnFormatting": {
+            "opt_confidence_pct": {
+              "type": "badge",
+              "colors": ["#E74C3C", "#F5A623", "#27AE60"],
+              "thresholds": [50, 80, 100]
+            }
+          }
+        }
+      },
+      {
+        "id": "w6",
+        "key": "widget_opt_6",
+        "type": "bar",
+        "title": "Actual vs Potencial por Pozo",
+        "sizeX": 12,
+        "sizeY": 10,
+        "row": 3,
+        "col": 12,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_opt_1",
+              "dataKeys": [
+                {
+                  "name": "flow_rate_bpd",
+                  "label": "Producción Actual",
+                  "color": "#1E3A5F"
+                },
+                {
+                  "name": "opt_expected_production_bpd",
+                  "label": "Producción Potencial",
+                  "color": "#27AE60"
+                }
+              ]
+            }
+          ],
+          "barChart": {
+            "groupBy": "entityName",
+            "xAxisLabel": "Pozos",
+            "yAxisLabel": "BPD",
+            "stacked": false
+          },
+          "legend": {
+            "enabled": true,
+            "position": "bottom"
+          }
+        }
+      },
+      {
+        "id": "w7",
+        "key": "widget_opt_7",
+        "type": "table",
+        "title": "Optimización de Inyección Gas Lift",
+        "sizeX": 12,
+        "sizeY": 8,
+        "row": 13,
+        "col": 0,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_opt_1",
+              "filter": {
+                "key": "lifting_type",
+                "operator": "EQUALS",
+                "value": "gas_lift"
+              },
+              "dataKeys": [
+                {
+                  "name": "entityName",
+                  "label": "Pozo GL",
+                  "type": "entity"
+                },
+                {
+                  "name": "injection_rate_mscfd",
+                  "label": "Iny. Actual MSCFD",
+                  "type": "attribute"
+                },
+                {
+                  "name": "opt_recommended_injection_rate_mscfd",
+                  "label": "Iny. Óptima MSCFD",
+                  "type": "attribute"
+                },
+                {
+                  "name": "flow_rate_bpd",
+                  "label": "Producción BPD",
+                  "type": "timeseries"
+                },
+                {
+                  "name": "opt_expected_production_bpd",
+                  "label": "Prod. Esperada BPD",
+                  "type": "attribute"
+                },
+                {
+                  "name": "opt_production_gain_pct",
+                  "label": "Ganancia %",
+                  "type": "attribute"
+                }
+              ]
+            }
+          ],
+          "pageSize": 20,
+          "sortColumn": "opt_production_gain_pct",
+          "sortOrder": "DESC",
+          "rowHighlight": {
+            "condition": "injectionDifference",
+            "threshold": 20,
+            "color": "#FFE6E6"
+          }
+        }
+      },
+      {
+        "id": "w8",
+        "key": "widget_opt_8",
+        "type": "pie",
+        "title": "Oportunidades por Tipo de Levantamiento",
+        "sizeX": 12,
+        "sizeY": 8,
+        "row": 13,
+        "col": 12,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_opt_1",
+              "dataKeys": [
+                {
+                  "name": "opt_production_gain_pct",
+                  "label": "Ganancia Potencial",
+                  "aggregationType": "SUM"
+                }
+              ],
+              "groupBy": "lifting_type"
+            }
+          ],
+          "pieChart": {
+            "type": "doughnut",
+            "segmentColors": {
+              "ESP": "#1E3A5F",
+              "SRP": "#F5A623",
+              "gas_lift": "#27AE60",
+              "PCP": "#E74C3C"
+            }
+          },
+          "legend": {
+            "enabled": true,
+            "position": "bottom"
+          }
+        }
+      },
+      {
+        "id": "w9",
+        "key": "widget_opt_9",
+        "type": "timeseries",
+        "title": "Tendencia de Ganancia Total del Campo",
+        "sizeX": 24,
+        "sizeY": 6,
+        "row": 21,
+        "col": 0,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "alias_opt_1",
+              "key": "opt_production_gain_pct",
+              "aggregationType": "AVG",
+              "dataAggregationType": "AVERAGE"
+            }
+          ],
+          "timeWindow": {
+            "period": "DAYS",
+            "value": 30
+          },
+          "chart": {
+            "type": "area",
+            "color": "#27AE60",
+            "fillOpacity": 0.3
+          },
+          "yAxis": {
+            "label": "Ganancia Promedio %"
+          },
+          "referenceLines": [
+            {
+              "value": 5,
+              "label": "Target 5%",
+              "color": "#F5A623",
+              "lineStyle": "dashed"
+            }
+          ],
+          "legend": {
+            "enabled": true,
+            "position": "bottom"
+          }
+        }
+      }
+    ],
+    "gridSize": 24,
+    "margin": 10,
+    "backgroundColor": "#F5F5F5"
+  },
+  "entityAliases": [
+    {
+      "id": "alias_opt_1",
+      "alias": "Todos los Pozos",
+      "filter": {
+        "type": "assetType",
+        "resolveMultiple": true,
+        "assetType": "well",
+        "assetNameFilter": ""
+      }
+    },
+    {
+      "id": "alias_opt_2",
+      "alias": "Campo",
+      "filter": {
+        "type": "assetType",
+        "resolveMultiple": false,
+        "assetType": "field"
+      }
+    }
+  ],
+  "dashboardSearchStatus": "COMPLETE",
+  "publicDashboardId": null,
+  "isPublic": false
+}

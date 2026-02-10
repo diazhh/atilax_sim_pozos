@@ -1,0 +1,142 @@
+{
+  "ruleChain": {
+    "name": "Atilax - Recepción de Resultados de Optimización",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 0,
+    "nodes": [
+      {
+        "id": "node_0",
+        "type": "org.thingsboard.rule.engine.flow.TbRuleChainInputNode",
+        "name": "Input",
+        "debugMode": false,
+        "configuration": {},
+        "layoutX": 100,
+        "layoutY": 200
+      },
+      {
+        "id": "node_1",
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "Message Type Switch",
+        "debugMode": false,
+        "configuration": {},
+        "layoutX": 300,
+        "layoutY": 200
+      },
+      {
+        "id": "node_2",
+        "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+        "name": "Validar Resultados",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "// Verificar que contiene al menos un campo de optimización opt_*\nvar hasOptFields = false;\nvar keys = Object.keys(msg);\nfor (var i = 0; i < keys.length; i++) {\n    if (keys[i].indexOf('opt_') === 0) {\n        hasOptFields = true;\n        break;\n    }\n}\nreturn hasOptFields;"
+        },
+        "layoutX": 550,
+        "layoutY": 200
+      },
+      {
+        "id": "node_3",
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgAttributesNode",
+        "name": "Guardar Resultados Optimización",
+        "debugMode": false,
+        "configuration": {
+          "scope": "SERVER_SCOPE",
+          "notifyDevice": false
+        },
+        "layoutX": 800,
+        "layoutY": 150
+      },
+      {
+        "id": "node_4",
+        "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+        "name": "¿Oportunidad Optimización?",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "// Si la ganancia predicha > 5% y confianza > 70%, es una oportunidad\nvar gain = msg.opt_production_gain_pct || msg.opt_expected_production_increase_pct || 0;\nvar confidence = msg.opt_confidence_pct || 0;\nreturn gain > 5 && confidence > 70;"
+        },
+        "layoutX": 800,
+        "layoutY": 300
+      },
+      {
+        "id": "node_5",
+        "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+        "name": "Alarma Oportunidad",
+        "debugMode": false,
+        "configuration": {
+          "alarmType": "OPTIMIZATION_OPPORTUNITY",
+          "severity": "INFO",
+          "propagate": true,
+          "propagateToOwner": true,
+          "alarmDetailsBuildJs": "var details = {};\ndetails.expectedGain = msg.opt_production_gain_pct || msg.opt_expected_production_increase_pct || 0;\ndetails.confidence = msg.opt_confidence_pct || 0;\ndetails.recommendedAction = msg.opt_recommended_action || msg.opt_action_required || 'No especificada';\ndetails.expectedProduction = msg.opt_expected_production_bpd || 0;\ndetails.recommendedFrequency = msg.opt_recommended_frequency_hz || null;\ndetails.recommendedSpeed = msg.opt_recommended_speed_rpm || null;\ndetails.recommendedInjection = msg.opt_recommended_injection_rate_mscfd || null;\ndetails.description = 'Oportunidad de optimización detectada. Ganancia esperada: ' + details.expectedGain + '%. Confianza: ' + details.confidence + '%. Acción: ' + details.recommendedAction;\nreturn details;"
+        },
+        "layoutX": 1050,
+        "layoutY": 300
+      },
+      {
+        "id": "node_6",
+        "type": "org.thingsboard.rule.engine.action.TbLogNode",
+        "name": "Log Resultados",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "return 'Resultados optimización recibidos para ' + metadata.deviceName + ': ' + JSON.stringify(msg).substring(0, 300);"
+        },
+        "layoutX": 1050,
+        "layoutY": 150
+      },
+      {
+        "id": "node_7",
+        "type": "org.thingsboard.rule.engine.action.TbLogNode",
+        "name": "Log Resultados Inválidos",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "return 'WARN: Atributos sin campos opt_* recibidos de ' + metadata.deviceName + ': ' + Object.keys(msg).join(', ');"
+        },
+        "layoutX": 550,
+        "layoutY": 350
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "Post attributes"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 3,
+        "type": "True"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 7,
+        "type": "False"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 4,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 6,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "True"
+      }
+    ],
+    "ruleChainConnections": []
+  }
+}
