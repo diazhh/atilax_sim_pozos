@@ -21,11 +21,14 @@ class PCPModel(WellModel):
     """PCP (Progressive Cavity Pump) well simulation model."""
 
     # Pump parameters
+    pump_model: str = "Moyno 7L6"
     pump_geometry: str = "2-3 lobe"
     pump_stages: int = 3
+    displacement_cc_rev: float = 1200.0
     max_rate_bpd: float = 2000.0
     max_differential_psi: float = 2000.0
     elastomer_type: str = "NBR"
+    elastomer_temp_max_f: float = 275.0
     design_temperature_f: float = 200.0
 
     # Drive parameters
@@ -33,6 +36,20 @@ class PCPModel(WellModel):
     max_rpm: float = 400.0
     max_torque_ftlb: float = 4500.0
     motor_hp: float = 60.0
+    motor_voltage_v: float = 460.0
+    gear_ratio: float = 14.7
+    has_vsd: bool = True
+    brake_type: str = "band"
+
+    # Rod string
+    rod_type: str = "continuous"
+    rod_diameter_in: float = 1.0
+    rod_grade: str = "D"
+    rod_coupling_type: str = "slim_hole"
+
+    # Fluid composition (well-specific)
+    h2s_ppm: float = 0.0
+    co2_pct: float = 0.0
 
     # Operating state
     drive_rpm: float = 250.0
@@ -150,15 +167,34 @@ class PCPModel(WellModel):
         """PCP-specific server attributes."""
         attrs = super().get_static_attributes()
         attrs.update({
+            # Pump
+            "pcp_pump_model": self.pump_model,
             "pcp_pump_geometry": self.pump_geometry,
             "pcp_pump_stages": self.pump_stages,
+            "pcp_displacement_cc_rev": self.displacement_cc_rev,
             "pcp_max_rate_bpd": self.max_rate_bpd,
             "pcp_max_differential_psi": self.max_differential_psi,
             "pcp_elastomer_type": self.elastomer_type,
+            "pcp_elastomer_temp_max_f": self.elastomer_temp_max_f,
+            "pcp_design_temperature_f": self.design_temperature_f,
+            # Drive / Motor
             "pcp_drive_type": self.drive_type,
             "pcp_max_rpm": self.max_rpm,
             "pcp_max_torque_ftlb": self.max_torque_ftlb,
             "pcp_motor_hp": self.motor_hp,
+            "pcp_motor_voltage_v": self.motor_voltage_v,
+            "pcp_gear_ratio": self.gear_ratio,
+            "pcp_has_vsd": self.has_vsd,
+            "pcp_brake_type": self.brake_type,
+            # Rod string
+            "pcp_rod_type": self.rod_type,
+            "pcp_rod_diameter_in": self.rod_diameter_in,
+            "pcp_rod_grade": self.rod_grade,
+            "pcp_rod_coupling_type": self.rod_coupling_type,
+            # Fluid composition
+            "pcp_h2s_ppm": self.h2s_ppm,
+            "pcp_co2_pct": self.co2_pct,
+            "pcp_sand_pct_initial": self.sand_pct,
             "install_date": "",
         })
         return attrs

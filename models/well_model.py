@@ -73,7 +73,14 @@ class WellModel:
     perforations_top_ft: float = 7000.0
     perforations_bottom_ft: float = 7500.0
     completion_type: str = "vertical"
+    well_deviation_deg: float = 0.0
     deviation_survey: list[dict[str, float]] = field(default_factory=list)
+
+    # Common production / completation parameters
+    production_target_bpd: float = 0.0
+    separator_pressure_psi: float = 80.0
+    wellhead_pressure_design_psi: float = 150.0
+    oil_price_usd_bbl: float = 70.0
 
     # Production tracking
     cumulative_oil_stb: float = 0.0
@@ -204,6 +211,12 @@ class WellModel:
             "perforations_top_ft": self.perforations_top_ft,
             "perforations_bottom_ft": self.perforations_bottom_ft,
             "completion_type": self.completion_type,
+            "well_deviation_deg": self.well_deviation_deg,
+            # Production & completation
+            "production_target_bpd": self.production_target_bpd,
+            "separator_pressure_psi": self.separator_pressure_psi,
+            "wellhead_pressure_design_psi": self.wellhead_pressure_design_psi,
+            "oil_price_usd_bbl": self.oil_price_usd_bbl,
             # Optimization placeholders
             "opt_last_run": "",
             "opt_current_operating_point_bpd": 0,

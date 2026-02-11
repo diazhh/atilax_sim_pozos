@@ -27,10 +27,12 @@ class ESPModel(WellModel):
     """
 
     # Pump parameters
+    pump_model: str = "DN1750"
     pump_stages: int = 200
     design_rate_bpd: float = 1200.0
     design_head_ft: float = 5000.0
     bep_rate_bpd: float = 1000.0
+    bep_head_ft_per_stage: float = 25.0
     efficiency_at_bep: float = 0.58
     min_flow_bpd: float = 300.0
     pump_efficiency: float = 0.58  # Current efficiency (degrades over time)
@@ -41,11 +43,20 @@ class ESPModel(WellModel):
     motor_amperage_a: float = 45.0
     motor_power_factor: float = 0.85
     motor_poles: int = 2
+    motor_temp_max_f: float = 350.0
 
     # VSD parameters
     vsd_installed: bool = True
     vsd_frequency_hz: float = 60.0
     vsd_nominal_hz: float = 60.0
+
+    # Alarm/shutdown thresholds (well-specific)
+    vibration_alarm_ips: float = 0.35
+    vibration_shutdown_ips: float = 0.50
+    motor_temp_alarm_f: float = 320.0
+    insulation_alarm_mohm: float = 200.0
+    underload_pct: float = 30.0
+    overload_pct: float = 110.0
 
     # Operating state (evolves during simulation)
     current_intake_pressure_psi: float = 800.0
@@ -188,16 +199,31 @@ class ESPModel(WellModel):
         """ESP-specific attributes added to base well attributes."""
         attrs = super().get_static_attributes()
         attrs.update({
+            # Pump
+            "esp_pump_model": self.pump_model,
             "esp_pump_stages": self.pump_stages,
             "esp_design_rate_bpd": self.design_rate_bpd,
             "esp_design_head_ft": self.design_head_ft,
             "esp_bep_rate_bpd": self.bep_rate_bpd,
+            "esp_bep_head_ft_per_stage": self.bep_head_ft_per_stage,
             "esp_efficiency_at_bep": self.efficiency_at_bep,
+            "esp_min_flow_bpd": self.min_flow_bpd,
+            # Motor
             "esp_motor_hp": self.motor_hp,
             "esp_motor_voltage_v": self.motor_voltage_v,
             "esp_motor_amperage_a": self.motor_amperage_a,
+            "esp_motor_power_factor": self.motor_power_factor,
+            "esp_motor_temp_max_f": self.motor_temp_max_f,
+            # VSD
             "esp_vsd_installed": self.vsd_installed,
             "esp_vsd_nominal_hz": self.vsd_nominal_hz,
+            # Alarm thresholds (well-specific)
+            "esp_vibration_alarm_ips": self.vibration_alarm_ips,
+            "esp_vibration_shutdown_ips": self.vibration_shutdown_ips,
+            "esp_motor_temp_alarm_f": self.motor_temp_alarm_f,
+            "esp_insulation_alarm_mohm": self.insulation_alarm_mohm,
+            "esp_underload_pct": self.underload_pct,
+            "esp_overload_pct": self.overload_pct,
             "install_date": "",
         })
         return attrs

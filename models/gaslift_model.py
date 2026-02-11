@@ -8,7 +8,7 @@ heading oscillations.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
@@ -19,16 +19,27 @@ from models.well_model import WellModel, LiftType, WellStatus
 class GasLiftModel(WellModel):
     """Gas Lift well simulation model."""
 
-    # Mandrel configuration
+    # Mandrel/Valve configuration
     num_mandrels: int = 5
     operating_valve_depth_ft: float = 7000.0
     valve_port_size_64ths: int = 16
+    valve_type: str = "IPO"
+    valve_depths_ft: list[float] = field(default_factory=lambda: [2000, 3500, 5000, 6000, 7000])
+    valve_opening_psi: list[float] = field(default_factory=lambda: [1200, 1100, 1000, 950, 900])
+    valve_closing_psi: list[float] = field(default_factory=lambda: [1050, 960, 870, 820, 780])
+    annular_volume_bbl: float = 120.0
 
     # Injection parameters
     injection_rate_mscfd: float = 600.0
     injection_pressure_psi: float = 1200.0
     optimal_injection_mscfd: float = 500.0
     max_injection_mscfd: float = 1200.0
+    design_injection_mscfd: float = 800.0
+
+    # Gas supply infrastructure
+    gas_supply_pressure_psi: float = 1300.0
+    gas_max_available_mscfd: float = 1200.0
+    gas_cost_usd_mscf: float = 2.50
 
     # Choke
     choke_size_64ths: int = 24
@@ -144,12 +155,26 @@ class GasLiftModel(WellModel):
         """Gas lift-specific server attributes."""
         attrs = super().get_static_attributes()
         attrs.update({
+            # Valve/mandrel configuration
             "gl_num_mandrels": self.num_mandrels,
             "gl_operating_valve_depth_ft": self.operating_valve_depth_ft,
             "gl_valve_port_size_64ths": self.valve_port_size_64ths,
+            "gl_valve_type": self.valve_type,
+            "gl_valve_depths_ft": self.valve_depths_ft,
+            "gl_valve_opening_psi": self.valve_opening_psi,
+            "gl_valve_closing_psi": self.valve_closing_psi,
+            "gl_annular_volume_bbl": self.annular_volume_bbl,
+            # Injection parameters
             "gl_optimal_injection_mscfd": self.optimal_injection_mscfd,
             "gl_max_injection_mscfd": self.max_injection_mscfd,
+            "gl_design_injection_mscfd": self.design_injection_mscfd,
             "gl_injection_pressure_psi": self.injection_pressure_psi,
+            # Gas infrastructure
+            "gl_gas_supply_pressure_psi": self.gas_supply_pressure_psi,
+            "gl_gas_max_available_mscfd": self.gas_max_available_mscfd,
+            "gl_gas_cost_usd_mscf": self.gas_cost_usd_mscf,
+            # Choke
+            "gl_choke_size_64ths": self.choke_size_64ths,
             "install_date": "",
         })
         return attrs

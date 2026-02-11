@@ -49,6 +49,15 @@ class ReservoirModel:
     drive_mechanism: str = "solution_gas"
     cumulative_oil_stb: float = 0.0
     ooip_stb: float = 500_000.0
+
+    # Fetkovich IPR parameters (for multi-rate test wells)
+    fetkovich_c: float = 0.0
+    fetkovich_n: float = 0.85
+
+    # Gas and water gravity
+    gas_gravity: float = 0.75
+    water_gravity: float = 1.05
+
     _rng: Generator = field(default_factory=lambda: np.random.default_rng())
 
     def set_rng(self, rng: Generator) -> None:
@@ -168,7 +177,7 @@ class ReservoirModel:
 
     def get_attributes(self) -> dict[str, object]:
         """Return server attributes for ThingsBoard."""
-        return {
+        attrs: dict[str, object] = {
             "reservoir_pressure_psi": self.initial_pressure_psi,
             "reservoir_temperature_f": self.temperature_f,
             "bubble_point_psi": self.bubble_point_psi,
@@ -185,4 +194,12 @@ class ReservoirModel:
             "ipr_model": self.ipr_model,
             "ipr_qmax_bpd": self.ipr_qmax_bpd,
             "drive_mechanism": self.drive_mechanism,
+            "gas_gravity": self.gas_gravity,
+            "water_gravity": self.water_gravity,
+            "ooip_stb": self.ooip_stb,
         }
+        # Add Fetkovich parameters only if applicable
+        if self.fetkovich_c > 0:
+            attrs["fetkovich_c"] = self.fetkovich_c
+            attrs["fetkovich_n"] = self.fetkovich_n
+        return attrs

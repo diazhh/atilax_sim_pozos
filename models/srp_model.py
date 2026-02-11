@@ -23,21 +23,33 @@ class SRPModel(WellModel):
 
     # Pumping unit
     unit_type: str = "conventional"
+    unit_size: str = "C-320D-256-120"
     beam_load_capacity_lb: float = 25000.0
     stroke_length_in: float = 144.0
     max_spm: float = 12.0
     prime_mover_hp: float = 50.0
+    gear_ratio: float = 30.12
+    crank_radius_in: float = 47.0
+    beam_length_in: float = 168.0
+    counterbalance_lbs: float = 12000.0
 
     # Downhole pump
     pump_bore_in: float = 2.0
+    pump_type: str = "insert"
     plunger_length_ft: float = 4.0
+    tubing_anchored: bool = True
 
     # Rod string
     rod_material: str = "grade_D"
     rod_weight_lb_ft: float = 2.2
+    rod_string: list[dict[str, Any]] = field(default_factory=lambda: [
+        {"grade": "D", "diameter_in": 0.875, "length_ft": 2500},
+        {"grade": "D", "diameter_in": 0.75, "length_ft": 3000},
+    ])
 
     # Operating parameters
     spm: float = 7.0
+    design_spm: float = 7.0
     pump_fillage_pct: float = 85.0
     fluid_level_ft: float = 2500.0
     stroke_counter: int = 0
@@ -210,13 +222,27 @@ class SRPModel(WellModel):
         """SRP-specific server attributes."""
         attrs = super().get_static_attributes()
         attrs.update({
+            # Surface unit
             "srp_unit_type": self.unit_type,
+            "srp_unit_size": self.unit_size,
             "srp_beam_load_capacity_lb": self.beam_load_capacity_lb,
             "srp_stroke_length_in": self.stroke_length_in,
             "srp_max_spm": self.max_spm,
+            "srp_design_spm": self.design_spm,
             "srp_prime_mover_hp": self.prime_mover_hp,
+            "srp_gear_ratio": self.gear_ratio,
+            "srp_crank_radius_in": self.crank_radius_in,
+            "srp_beam_length_in": self.beam_length_in,
+            "srp_counterbalance_lbs": self.counterbalance_lbs,
+            # Downhole pump
             "srp_pump_bore_in": self.pump_bore_in,
+            "srp_pump_type": self.pump_type,
+            "srp_plunger_length_ft": self.plunger_length_ft,
+            "srp_tubing_anchored": self.tubing_anchored,
+            # Rod string
             "srp_rod_material": self.rod_material,
+            "srp_rod_weight_lb_ft": self.rod_weight_lb_ft,
+            "srp_rod_string": self.rod_string,
             "install_date": "",
         })
         return attrs
